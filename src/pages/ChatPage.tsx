@@ -5,29 +5,7 @@ import Sidebar from '../components/dashboard/Sidebar';
 import AgentSelector from '../components/dashboard/AgentSelector';
 import FileChip from '../components/ui/FileChip';
 import CsvDataTable from '../components/ui/CsvDataTable';
-
-interface AttachedFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  file: File;
-}
-
-interface Message {
-  id: string;
-  type: 'user' | 'assistant' | 'auth';
-  content: string;
-  timestamp: Date;
-  details?: string[];
-  isExpanded?: boolean;
-  isCollapsible?: boolean;
-  hasDownload?: boolean;
-  downloadFileName?: string;
-  csvContentData?: string;
-  showApprovalButtons?: boolean;
-  showAuthButtons?: boolean;
-}
+import { useChat, AttachedFile, ChatMessage } from '../contexts/ChatContext';
 
 interface ChatPageProps {
   initialQuery: string;
@@ -48,10 +26,10 @@ const ChatPage: React.FC<ChatPageProps> = ({
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [newMessage, setNewMessage] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
   const [systemMessage, setSystemMessage] = useState('Analyzing your request...');
   const [isProcessing, setIsProcessing] = useState(true);
   const [authCompleted, setAuthCompleted] = useState(false);
+  const { messages, setMessages, addMessage, addUserMessage } = useChat();
   
   // Q&A Flow State
   const [queryFlowStep, setQueryFlowStep] = useState(0);
@@ -89,25 +67,23 @@ const ChatPage: React.FC<ChatPageProps> = ({
       if (runningPlaybookId) {
         const playbookTitle = getPlaybookTitle(runningPlaybookId);
         
-        setMessages([{
-          id: Date.now().toString(),
+        // Clear existing messages and add the playbook start message
+        setMessages([]);
+        addMessage({
           type: 'assistant',
           content: `Starting playbook execution: ${playbookTitle}`,
-          timestamp: new Date(),
-        }]);
+        });
 
         setSystemMessage('Preparing playbook execution...');
 
         const timeouts: NodeJS.Timeout[] = [];
 
         timeouts.push(setTimeout(() => {
-          setMessages(prev => [...prev, {
-            id: `auth-required-${Date.now()}`,
+          addMessage({
             type: 'auth',
             content: 'This playbook requires access to your Google Ads account to analyze campaign data and implement recommendations.',
-            timestamp: new Date(),
             showAuthButtons: true,
-          }]);
+          });
           setSystemMessage('Authentication required');
           setIsProcessing(false);
         }, 1500));
@@ -116,13 +92,11 @@ const ChatPage: React.FC<ChatPageProps> = ({
           timeouts.forEach(timeout => clearTimeout(timeout));
         };
       } else {
-        // Regular query handling with Q&A flow
-        setMessages([{
-          id: Date.now().toString(),
-          type: 'user',
-          content: initialQuery,
-          timestamp: new Date(),
-        }]);
+        // For regular queries, check if we already have messages from BuildPage
+        // If not, add the initial query
+        if (messages.length === 0) {
+          addUserMessage(initialQuery);
+        }
 
         // Check if this is an Amazon scaling query
         if (isAmazonScalingQuery(initialQuery)) {
@@ -130,12 +104,10 @@ const ChatPage: React.FC<ChatPageProps> = ({
           setQueryFlowStep(1);
           
           const timeout = setTimeout(() => {
-            setMessages(prev => [...prev, {
-              id: `questions-${Date.now()}`,
+            addMessage({
               type: 'assistant',
               content: `Great! I'll help you identify scaling opportunities for your Amazon ads. To provide the most relevant recommendations, I need to understand your current situation better.\n\nPlease answer these 3 questions:\n\n1. What's your current monthly Amazon ads spend?\n   (e.g., $5,000, $25,000, $100,000+)\n\n2. What's your primary goal for scaling?\n   (e.g., Increase sales volume, Improve ACoS, Expand to new products, Enter new markets)\n\n3. What's your biggest current challenge with Amazon ads?\n   (e.g., High ACoS, Limited inventory, Competition, Keyword research, Campaign structure)\n\nYou can answer all three questions in one message, or answer them one by one.`,
-              timestamp: new Date(),
-            }]);
+            });
             setSystemMessage('Waiting for your answers to create a personalized plan');
             setIsProcessing(false);
           }, 2000);
@@ -144,12 +116,10 @@ const ChatPage: React.FC<ChatPageProps> = ({
         } else {
           // Standard response for non-Amazon scaling queries
           const timeout = setTimeout(() => {
-            setMessages(prev => [...prev, {
-              id: `response-${Date.now()}`,
+            addMessage({
               type: 'assistant',
               content: 'I analyzed the Twitter and Reddit discussions in the Amazon ads industry from this week. Here are the top three trending topics:\n\n1. Increased CPCs across multiple categories\n2. New AI-powered targeting features\n3. Updates to attribution windows',
-              timestamp: new Date(),
-            }]);
+            });
             setSystemMessage('Ready for your next question');
             setIsProcessing(false);
           }, 2000);
@@ -158,15 +128,14 @@ const ChatPage: React.FC<ChatPageProps> = ({
         }
       }
     }
-  }, [initialQuery, runningPlaybookId]);
+  }, [initialQuery, runningPlaybookId, messages.length, addMessage, addUserMessage, setMessages]);
 
   const handleGoogleAdsAuth = () => {
     // Hide the auth panel by marking auth as completed
     setAuthCompleted(true);
     
     // Authentication flow implementation
-    setMessages(prev => [...prev, {
-      id: `auth-success-${Date.now()}`,
+    addMessage({
       type: 'assistant',
       content: `Google Ads authentication successful!
 
@@ -175,8 +144,7 @@ Connected Account Details:
 • Email: marketing@yourcompany.com
 
 Starting data analysis...`,
-      timestamp: new Date(),
-    }]);
+    });
     setSystemMessage('Analyzing your Google Ads data...');
     setIsProcessing(true);
 
@@ -184,11 +152,9 @@ Starting data analysis...`,
 
     // Step 1: Data Collection
     timeouts.push(setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: `step1-${Date.now()}`,
+      addMessage({
         type: 'assistant',
         content: 'Step 1: Collecting campaign data from Google Ads',
-        timestamp: new Date(),
         isCollapsible: true,
         details: [
           'Campaigns Found: 12 active campaigns',
@@ -196,17 +162,15 @@ Starting data analysis...`,
           'Collecting search terms, keywords, and match types',
           'Gathering cost, click, and conversion metrics'
         ]
-      }]);
+      });
       setSystemMessage('Collecting campaign data...');
     }, 1500));
 
     // Step 2: Analysis
     timeouts.push(setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: `step2-${Date.now()}`,
+      addMessage({
         type: 'assistant',
         content: 'Step 2: Analyzing campaign data for patterns',
-        timestamp: new Date(),
         isCollapsible: true,
         details: [
           'Processing 2,847 search terms from 12 campaigns',
@@ -214,17 +178,15 @@ Starting data analysis...`,
           'Analyzing search term relevance to your products',
           'Calculating potential cost savings for each negative keyword'
         ]
-      }]);
+      });
       setSystemMessage('Analyzing performance patterns...');
     }, 3000));
 
     // Step 3: Identification
     timeouts.push(setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: `step3-${Date.now()}`,
+      addMessage({
         type: 'assistant',
         content: 'Step 3: Identifying negative keyword opportunities',
-        timestamp: new Date(),
         isCollapsible: true,
         details: [
           'Found 47 potential negative keywords',
@@ -232,17 +194,15 @@ Starting data analysis...`,
           'Categorizing by match type recommendations',
           'Validating against your product catalog'
         ]
-      }]);
+      });
       setSystemMessage('Identifying optimization opportunities...');
     }, 4500));
 
     // Step 4: Recommendations
     timeouts.push(setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: `step4-${Date.now()}`,
+      addMessage({
         type: 'assistant',
         content: 'Step 4: Generating actionable recommendations',
-        timestamp: new Date(),
         isCollapsible: true,
         details: [
           'Creating prioritized negative keyword list',
@@ -250,7 +210,7 @@ Starting data analysis...`,
           'Preparing implementation instructions',
           'Generating performance impact projections'
         ]
-      }]);
+      });
       setSystemMessage('Generating recommendations...');
     }, 6000));
 
@@ -273,8 +233,7 @@ help,Broad,140,4,$32.00,0,Add as negative keyword - High Priority
 support,Phrase,120,3,$28.00,0,Add as negative keyword - High Priority
 service,Broad,100,2,$22.00,1,Monitor - evaluate based on strategy`;
 
-      setMessages(prev => [...prev, {
-        id: `results-${Date.now()}`,
+      addMessage({
         type: 'assistant',
         content: `🎯 Analysis Complete! I found 47 potential negative keywords that could save you approximately $2,340 per month.
 
@@ -283,10 +242,9 @@ Key Findings:
 • Campaigns reviewed: 12
 • Potential monthly savings: $2,340
 • Estimated CTR improvement: +0.8%`,
-        timestamp: new Date(),
         csvContentData: csvContent,
         showApprovalButtons: true
-      }]);
+      });
       setSystemMessage('Analysis complete - Ready for next steps');
       setIsProcessing(false);
     }, 7500));
@@ -302,8 +260,7 @@ Key Findings:
     
     // Manual upload flow
     setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: `upload-instructions-${Date.now()}`,
+      addMessage({
         type: 'assistant',
         content: `Perfect! Please upload your Google Ads search terms report.
 
@@ -313,8 +270,7 @@ How to get this data from Google Ads:
 3. Click Download → CSV or xlsx or xls format is fine
 
 Once you upload the file, I'll analyze it and provide negative keyword recommendations.`,
-        timestamp: new Date(),
-      }]);
+      });
       setSystemMessage('Ready to analyze your uploaded data');
       setIsProcessing(false);
     }, 1500);
@@ -326,16 +282,13 @@ Once you upload the file, I'll analyze it and provide negative keyword recommend
       msg.showApprovalButtons ? { ...msg, showApprovalButtons: false } : msg
     ));
 
-    setMessages(prev => [...prev, {
-      id: `user-approval-${Date.now()}`,
+    addMessage({
       type: 'user',
       content: 'Approve Recommendations',
-      timestamp: new Date(),
-    }]);
+    });
 
     setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: `approval-response-${Date.now()}`,
+      addMessage({
         type: 'assistant',
         content: `✅ Recommendations approved! 
 
@@ -352,8 +305,7 @@ Expected impact:
 • Reduced wasted spend: ~$2,340/month
 • Improved CTR: +0.8%
 • Better conversion rates: +12%`,
-        timestamp: new Date(),
-      }]);
+      });
       setSystemMessage('Implementation in progress');
     }, 1500);
   };
@@ -364,16 +316,13 @@ Expected impact:
       msg.showApprovalButtons ? { ...msg, showApprovalButtons: false } : msg
     ));
 
-    setMessages(prev => [...prev, {
-      id: `user-feedback-${Date.now()}`,
+    addMessage({
       type: 'user',
       content: 'Provide Feedback',
-      timestamp: new Date(),
-    }]);
+    });
 
     setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: `feedback-response-${Date.now()}`,
+      addMessage({
         type: 'assistant',
         content: `I'd love to hear your feedback on these recommendations! Please let me know:
 
@@ -383,8 +332,7 @@ Expected impact:
 • Are there specific campaigns or ad groups where you'd like different treatment?
 
 Just type your feedback below and I'll refine the recommendations accordingly.`,
-        timestamp: new Date(),
-      }]);
+      });
       setSystemMessage('Waiting for your feedback');
     }, 1500);
   };
@@ -394,12 +342,10 @@ Just type your feedback below and I'll refine the recommendations accordingly.`,
 
     // Handle Q&A flow responses
     if (queryFlowStep === 1) {
-      setMessages(prev => [...prev, {
-        id: `user-answers-${Date.now()}`,
+      addMessage({
         type: 'user',
         content: newMessage,
-        timestamp: new Date(),
-      }]);
+      });
 
       const userResponse = newMessage;
       setNewMessage('');
@@ -410,8 +356,7 @@ Just type your feedback below and I'll refine the recommendations accordingly.`,
       setUserAnswers([userResponse]);
 
       setTimeout(() => {
-        setMessages(prev => [...prev, {
-          id: `plan-response-${Date.now()}`,
+        addMessage({
           type: 'assistant',
           content: `Perfect! Based on your responses and the original query "${currentQueryContext}", here's your personalized Amazon ads scaling plan:
 
@@ -449,8 +394,7 @@ Expected Results
 • Better inventory velocity for top products
 
 Would you like me to dive deeper into any of these strategies or help you implement specific recommendations?`,
-          timestamp: new Date(),
-        }]);
+        });
         
         // Reset Q&A flow
         setQueryFlowStep(0);
@@ -464,8 +408,354 @@ Would you like me to dive deeper into any of these strategies or help you implem
     }
 
     // Regular message handling for non-Q&A flow
-    setMessages(prev => [...prev, {
-      id: `user-${Date.now()}`,
+    addUserMessage(newMessage, attachedFiles.length > 0 ? attachedFiles : undefined);
+    
+    // Clear attached files after sending
+    setAttachedFiles([]);
+    
+    setNewMessage('');
+    setSystemMessage('Processing your request...');
+    setIsProcessing(true);
+
+    setTimeout(() => {
+      addMessage({
+        type: 'assistant',
+        content: 'Here is a simulated response to your message.',
+      });
+      setSystemMessage('Ready for your next question');
+      setIsProcessing(false);
+    }, 2000);
+  };
+
+  const renderAttachedFiles = (files: AttachedFile[]) => {
+    if (!files || files.length === 0) return null;
+    
+    return (
+      <div className="mt-3 pt-3 border-t border-gray-200">
+        <div className="flex flex-wrap gap-2">
+          {files.map((file) => (
+            <FileChip
+              key={file.id}
+              fileName={file.name}
+              size={file.size}
+              type="attachment"
+              className="bg-blue-50 border-blue-200 text-blue-800"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const toggleMessageDetails = (messageId: string) => {
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId 
+        ? { ...msg, isExpanded: !msg.isExpanded }
+        : msg
+    ));
+  };
+
+  const handleDownload = (fileName: string) => {
+    // In a real app, this would trigger the actual file download
+    console.log('Downloading file:', fileName);
+    
+    // Create a mock CSV content for demonstration
+    const csvContent = `Search Term,Match Type,Impressions,Clicks,Cost,Conversions,Recommendation
+free,Broad,1250,45,$450.00,0,Add as negative keyword - High Priority
+cheap,Phrase,890,32,$280.00,1,Add as negative keyword - High Priority
+tutorial,Exact,670,28,$220.00,0,Add as negative keyword - High Priority
+download,Broad,540,19,$180.00,0,Add as negative keyword - High Priority
+review,Phrase,420,15,$120.00,2,Consider for broad match negative only
+comparison,Broad,380,12,$95.00,1,Monitor - may keep for awareness
+vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const getPlaceholderText = () => {
+    if (queryFlowStep === 1) {
+      return "Answer the 3 questions above to get your personalized scaling plan...";
+    }
+    return "Type your message...";
+  };
+
+  return (
+    <div className="min-h-screen bg-[#FAFAFA] flex">
+      <Sidebar 
+        isOpen={isSidebarOpen} 
+        onMouseEnter={() => setIsSidebarOpen(true)}
+        onMouseLeave={() => setIsSidebarOpen(false)}
+        onNewPlaybook={onNewPlaybook}
+        onMyPlaybooks={onMyPlaybooks}
+      />
+
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-16'}`}>
+        {/* Header - Removed Back button, kept other elements */}
+        <header className="h-16 flex items-center justify-between px-6 bg-[#FAFAFA]">
+          <div className="flex items-center space-x-4">
+            {runningPlaybookId && (
+              <div className="flex items-center space-x-2">
+                <Play size={16} className="text-[#FF7F50]" />
+                <span className="text-sm font-medium text-gray-700">
+                  Running: {getPlaybookTitle(runningPlaybookId)}
+                </span>
+              </div>
+            )}
+            {queryFlowStep === 1 && (
+              <div className="flex items-center space-x-2">
+                <MessageSquare size={16} className="text-blue-500" />
+                <span className="text-sm font-medium text-blue-700">
+                  Q&A Mode: Amazon Ads Scaling
+                </span>
+              </div>
+            )}
+          </div>
+          <button 
+            onClick={onNavigateToConnectedAccounts}
+            className="w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-gray-200 transition-all"
+          >
+            <img
+              src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=2"
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          </button>
+        </header>
+
+        {/* Chat Area */}
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-4xl mx-auto space-y-6">
+            {messages.map((message, index) => {
+              // Skip rendering auth messages if auth is completed
+              if (message.type === 'auth' && authCompleted) {
+                return null;
+              }
+
+              return (
+                <div
+                  key={message.id}
+                  className={`flex ${
+                    message.type === 'user' ? 'justify-end' : 
+                    message.type === 'auth' ? 'justify-center' : 'justify-start'
+                  } mb-6`}
+                >
+                  <div className={`${
+                    message.type === 'user' 
+                      ? 'max-w-[80%] bg-gray-100 text-gray-800 rounded-2xl p-4 border border-gray-200' 
+                      : message.type === 'auth'
+                      ? 'bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 w-full max-w-md'
+                      : message.isCollapsible 
+                      ? 'bg-[#FFF5F2] border border-[#FFE5DC] rounded-2xl overflow-hidden w-full max-w-[80%]'
+                      : message.csvContentData
+                      ? 'w-full max-w-[90%]'
+                      : 'max-w-[80%] bg-white text-gray-800 shadow-sm rounded-2xl p-4'
+                  }`}>
+                    {message.type === 'auth' ? (
+                      <>
+                        <div className="text-center">
+                          <div className="flex justify-center mb-4">
+                            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                              <Shield size={24} className="text-blue-600" />
+                            </div>
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                            Google Ads Authentication Required
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-6">
+                            {message.content}
+                          </p>
+                          
+                          {message.showAuthButtons && (
+                            <div className="space-y-3">
+                              <button
+                                onClick={handleGoogleAdsAuth}
+                                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                              >
+                                <img 
+                                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+                                  alt="Google" 
+                                  className="w-5 h-5"
+                                />
+                                <span>Connect Google Ads Account</span>
+                                <ExternalLink size={16} />
+                              </button>
+                              
+                              <div className="flex items-center my-4">
+                                <div className="flex-grow h-px bg-gray-200"></div>
+                                <span className="px-4 text-sm text-gray-500">OR</span>
+                                <div className="flex-grow h-px bg-gray-200"></div>
+                              </div>
+                              
+                              <button
+                                onClick={handleManualUpload}
+                                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors border border-gray-300"
+                              >
+                                <Upload size={16} />
+                                <span>Upload Search Terms Data Manually</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    ) : message.isCollapsible ? (
+                      <>
+                        <button
+                          onClick={() => toggleMessageDetails(message.id)}
+                          className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#FFE5DC] transition-colors"
+                        >
+                          <div className="flex items-center space-x-2 flex-1 min-w-0">
+                            <div className="w-2 h-2 bg-[#FF7F50] rounded-full animate-pulse flex-shrink-0"></div>
+                            <span className="text-sm font-medium text-black truncate">{message.content}</span>
+                          </div>
+                          <div className="flex-shrink-0 ml-2">
+                            {message.isExpanded ? (
+                              <ChevronUp size={16} className="text-gray-500" />
+                            ) : (
+                              <ChevronDown size={16} className="text-gray-500" />
+                            )}
+                          </div>
+                        </button>
+
+                        {message.isExpanded && message.details && (
+                          <div className="px-4 pb-4 border-t border-[#FFE5DC] bg-white">
+                            <div className="space-y-2 pt-3">
+                              {message.details.map((detail, detailIndex) => (
+                                <div key={detailIndex} className="flex items-start space-x-2">
+                                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></div>
+                                  <p className="text-sm text-gray-600 leading-relaxed">{detail}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : message.csvContentData ? (
+                      <div className="bg-white text-gray-800 shadow-sm rounded-2xl p-4">
+                        <div className="whitespace-pre-wrap text-sm font-medium text-black mb-4">
+                          {message.content}
+                        </div>
+                        <CsvDataTable 
+                          csvString={message.csvContentData} 
+                          fileName="negative-keywords-recommendations.csv"
+                          onApprove={handleApproveRecommendations}
+                          onFeedback={handleProvideFeedback}
+                          showActions={message.showApprovalButtons}
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="whitespace-pre-wrap text-sm font-medium text-black">
+                          {message.content}
+                        </div>
+                        {message.hasDownload && message.downloadFileName && (
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <FileChip
+                              fileName={message.downloadFileName}
+                              onClick={() => handleDownload(message.downloadFileName!)}
+                              type="download"
+                            />
+                          </div>
+                        )}
+                        {/* Render attached files for user messages */}
+                        {message.type === 'user' && message.attachedFiles && (
+                          renderAttachedFiles(message.attachedFiles)
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* System Status & Input Area */}
+        <div className="px-6 pb-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-[#FFF5F2] rounded-t-lg p-3 flex items-center gap-3">
+              {isProcessing ? (
+                <Loader2 size={16} className="text-[#FF7F50] animate-spin" />
+              ) : (
+                <div className="w-2 h-2 rounded-full bg-[#22C55E]" />
+              )}
+              <span className="text-sm text-[#FF7F50] font-medium">
+                {systemMessage}
+              </span>
+            </div>
+
+            <div className="relative bg-white rounded-b-2xl shadow-sm">
+              {/* Attached Files Display */}
+              {attachedFiles.length > 0 && (
+                <div className="p-4 pb-0 flex flex-wrap gap-2">
+                  {attachedFiles.map((file) => (
+                    <FileChip
+                      key={file.id}
+                      fileName={file.name}
+                      size={file.size}
+                      type="attachment"
+                      onClick={() => handleRemoveFile(file.id)}
+                      className="cursor-pointer hover:bg-red-50 hover:border-red-200"
+                    />
+                  ))}
+                </div>
+              )}
+
+              <textarea
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={getPlaceholderText()}
+                className="w-full min-h-[120px] p-4 bg-transparent rounded-b-2xl focus:outline-none resize-none text-[#333333] placeholder-gray-400"
+                disabled={isProcessing}
+              />
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                <AgentSelector />
+                
+                <div className="flex items-center space-x-2">
+                  <button 
+                    onClick={handleFileAttachment}
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    disabled={isProcessing}
+                    title="Attach files"
+                  >
+                    <Paperclip size={20} />
+                  </button>
+                  <button 
+                    onClick={handleSendMessage}
+                    disabled={!newMessage.trim() || isProcessing}
+                    className="p-2.5 bg-[#FF7F50] text-white rounded-full hover:bg-[#E67348] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ArrowRight size={20} />
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Hidden File Input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+              accept=".pdf,.doc,.docx,.txt,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.gif,.zip"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ChatPage;
       type: 'user',
       content: newMessage,
       timestamp: new Date(),

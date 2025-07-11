@@ -1,5 +1,6 @@
 import React from 'react';
 import { AuthProvider } from './contexts/AuthContext';
+import { ChatProvider } from './contexts/ChatContext';
 import LoginPage from './pages/LoginPage';
 import BuildPage from './pages/BuildPage';
 import ChatPage from './pages/ChatPage';
@@ -196,7 +197,9 @@ const AppContent: React.FC = () => {
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <ChatProvider>
+        <AppContent />
+      </ChatProvider>
     </AuthProvider>
   );
 }

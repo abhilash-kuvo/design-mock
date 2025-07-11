@@ -4,14 +4,7 @@ import Sidebar from '../components/dashboard/Sidebar';
 import AgentSelector from '../components/dashboard/AgentSelector';
 import PlaybookTile from '../components/dashboard/PlaybookTile';
 import FileChip from '../components/ui/FileChip';
-
-interface AttachedFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  file: File;
-}
+import { useChat, AttachedFile } from '../contexts/ChatContext';
 
 interface BuildPageProps {
   onSubmit: (query: string) => void;
@@ -33,6 +26,7 @@ const BuildPage: React.FC<BuildPageProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { addUserMessage } = useChat();
 
   const handleSubmit = () => {
     if (!query.trim()) return;
@@ -41,6 +35,12 @@ const BuildPage: React.FC<BuildPageProps> = ({
     
     // Simulate processing delay
     setTimeout(() => {
+      // Add the message and files to the shared chat context
+      addUserMessage(query, attachedFiles.length > 0 ? attachedFiles : undefined);
+      
+      // Clear the attached files after sending
+      setAttachedFiles([]);
+      
       onSubmit(query);
       setIsProcessing(false);
     }, 1000);
