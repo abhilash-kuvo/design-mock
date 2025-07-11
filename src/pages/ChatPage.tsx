@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRef, useCallback } from 'react';
+import { useRef } from 'react';
 import { ArrowRight, Paperclip, Loader2, Play, ChevronDown, ChevronUp, CheckCircle, MessageSquare, Shield, ExternalLink, Upload } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import AgentSelector from '../components/dashboard/AgentSelector';
@@ -36,9 +36,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [currentQueryContext, setCurrentQueryContext] = useState('');
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
 
-  // Track if we've already processed the initial query to prevent loops
-  const hasProcessedInitialQuery = useRef(false);
-
   // File attachment state
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -65,15 +62,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   };
 
   useEffect(() => {
-    // Prevent processing if we've already handled the initial query
-    if (hasProcessedInitialQuery.current) {
-      return;
-    }
-
     if (initialQuery) {
-      // Mark that we're processing the initial query
-      hasProcessedInitialQuery.current = true;
-
       // If running a playbook, show authentication flow first
       if (runningPlaybookId) {
         const playbookTitle = getPlaybookTitle(runningPlaybookId);
@@ -103,36 +92,38 @@ const ChatPage: React.FC<ChatPageProps> = ({
           timeouts.forEach(timeout => clearTimeout(timeout));
         };
       } else {
-        // For regular queries, the message should already be in context from BuildPage
-        // Just add the assistant response
+        // For regular queries, only add initial response if we don't have any assistant messages yet
+        const hasAssistantMessages = messages.some(msg => msg.type === 'assistant');
+        
+        if (!hasAssistantMessages) {
+          // Check if this is an Amazon scaling query
+          if (isAmazonScalingQuery(initialQuery)) {
+            setCurrentQueryContext(initialQuery);
+            setQueryFlowStep(1);
+            
+            const timeout = setTimeout(() => {
+              addMessage({
+                type: 'assistant',
+                content: `Great! I'll help you identify scaling opportunities for your Amazon ads. To provide the most relevant recommendations, I need to understand your current situation better.\n\nPlease answer these 3 questions:\n\n1. What's your current monthly Amazon ads spend?\n   (e.g., $5,000, $25,000, $100,000+)\n\n2. What's your primary goal for scaling?\n   (e.g., Increase sales volume, Improve ACoS, Expand to new products, Enter new markets)\n\n3. What's your biggest current challenge with Amazon ads?\n   (e.g., High ACoS, Limited inventory, Competition, Keyword research, Campaign structure)\n\nYou can answer all three questions in one message, or answer them one by one.`,
+              });
+              setSystemMessage('Waiting for your answers to create a personalized plan');
+              setIsProcessing(false);
+            }, 2000);
 
-        // Check if this is an Amazon scaling query
-        if (isAmazonScalingQuery(initialQuery)) {
-          setCurrentQueryContext(initialQuery);
-          setQueryFlowStep(1);
-          
-          const timeout = setTimeout(() => {
-            addMessage({
-              type: 'assistant',
-              content: `Great! I'll help you identify scaling opportunities for your Amazon ads. To provide the most relevant recommendations, I need to understand your current situation better.\n\nPlease answer these 3 questions:\n\n1. What's your current monthly Amazon ads spend?\n   (e.g., $5,000, $25,000, $100,000+)\n\n2. What's your primary goal for scaling?\n   (e.g., Increase sales volume, Improve ACoS, Expand to new products, Enter new markets)\n\n3. What's your biggest current challenge with Amazon ads?\n   (e.g., High ACoS, Limited inventory, Competition, Keyword research, Campaign structure)\n\nYou can answer all three questions in one message, or answer them one by one.`,
-            });
-            setSystemMessage('Waiting for your answers to create a personalized plan');
-            setIsProcessing(false);
-          }, 2000);
+            return () => clearTimeout(timeout);
+          } else {
+            // Standard response for non-Amazon scaling queries
+            const timeout = setTimeout(() => {
+              addMessage({
+                type: 'assistant',
+                content: 'I analyzed the Twitter and Reddit discussions in the Amazon ads industry from this week. Here are the top three trending topics:\n\n1. Increased CPCs across multiple categories\n2. New AI-powered targeting features\n3. Updates to attribution windows',
+              });
+              setSystemMessage('Ready for your next question');
+              setIsProcessing(false);
+            }, 2000);
 
-          return () => clearTimeout(timeout);
-        } else {
-          // Standard response for non-Amazon scaling queries
-          const timeout = setTimeout(() => {
-            addMessage({
-              type: 'assistant',
-              content: 'I analyzed the Twitter and Reddit discussions in the Amazon ads industry from this week. Here are the top three trending topics:\n\n1. Increased CPCs across multiple categories\n2. New AI-powered targeting features\n3. Updates to attribution windows',
-            });
-            setSystemMessage('Ready for your next question');
-            setIsProcessing(false);
-          }, 2000);
-
-          return () => clearTimeout(timeout);
+            return () => clearTimeout(timeout);
+          }
         }
       }
     }
