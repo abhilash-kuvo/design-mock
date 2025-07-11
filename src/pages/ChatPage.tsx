@@ -5,7 +5,14 @@ import Sidebar from '../components/dashboard/Sidebar';
 import AgentSelector from '../components/dashboard/AgentSelector';
 import FileChip from '../components/ui/FileChip';
 import CsvDataTable from '../components/ui/CsvDataTable';
+import SystemLogHistoryPanel from '../components/SystemLogHistoryPanel';
 import { useChat, AttachedFile, ChatMessage } from '../contexts/ChatContext';
+
+interface SystemLogEntry {
+  id: string;
+  message: string;
+  timestamp: Date;
+}
 
 interface ChatPageProps {
   initialQuery: string;
@@ -26,9 +33,11 @@ const ChatPage: React.FC<ChatPageProps> = ({
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [newMessage, setNewMessage] = useState('');
-  const [systemMessage, setSystemMessage] = useState('Analyzing your request...');
+  const [systemLog, setSystemLog] = useState('Analyzing your request...');
   const [isProcessing, setIsProcessing] = useState(true);
   const [authCompleted, setAuthCompleted] = useState(false);
+  const [systemLogHistory, setSystemLogHistory] = useState<SystemLogEntry[]>([]);
+  const [showLogHistoryPanel, setShowLogHistoryPanel] = useState(false);
   const { messages, setMessages, addMessage, addUserMessage } = useChat();
   
   // Q&A Flow State
@@ -39,6 +48,17 @@ const ChatPage: React.FC<ChatPageProps> = ({
   // File attachment state
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Helper function to update system log and add to history
+  const updateSystemLog = (message: string) => {
+    setSystemLog(message);
+    const logEntry: SystemLogEntry = {
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      message,
+      timestamp: new Date(),
+    };
+    setSystemLogHistory(prev => [logEntry, ...prev]);
+  };
 
   // Mock playbook data for display
   const getPlaybookTitle = (playbookId: string) => {
@@ -66,7 +86,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
           content: `Starting playbook execution: ${playbookTitle}`,
         });
 
-        setSystemMessage('Preparing playbook execution...');
+        updateSystemLog('Preparing playbook execution...');
 
         const timeouts: NodeJS.Timeout[] = [];
 
@@ -76,7 +96,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
             content: 'This playbook requires access to your Google Ads account to analyze campaign data and implement recommendations.',
             showAuthButtons: true,
           });
-          setSystemMessage('Authentication required');
+          updateSystemLog('Authentication required');
           setIsProcessing(false);
         }, 1500));
 
@@ -91,14 +111,14 @@ const ChatPage: React.FC<ChatPageProps> = ({
           // All queries trigger Amazon Ads scaling Q&A flow
           setCurrentQueryContext(initialQuery);
           setQueryFlowStep(1);
-          setSystemMessage('Analyzing your request...');
+          updateSystemLog('Analyzing your request...');
           
           const timeout = setTimeout(() => {
             addMessage({
               type: 'assistant',
               content: `Great! I'll help you identify scaling opportunities for your Amazon ads. To provide the most relevant recommendations, I need to understand your current situation better.\n\nPlease answer these 3 questions:\n\n1. What's your current monthly Amazon ads spend?\n   (e.g., $5,000, $25,000, $100,000+)\n\n2. What's your primary goal for scaling?\n   (e.g., Increase sales volume, Improve ACoS, Expand to new products, Enter new markets)\n\n3. What's your biggest current challenge with Amazon ads?\n   (e.g., High ACoS, Limited inventory, Competition, Keyword research, Campaign structure)\n\nYou can answer all three questions in one message, or answer them one by one.`,
             });
-            setSystemMessage('Waiting for your answers to create a personalized plan');
+            updateSystemLog('Waiting for your answers to create a personalized plan');
             setIsProcessing(false);
           }, 2000);
 
@@ -123,7 +143,7 @@ Connected Account Details:
 
 Starting data analysis...`,
     });
-    setSystemMessage('Analyzing your Google Ads data...');
+    updateSystemLog('Analyzing your Google Ads data...');
     setIsProcessing(true);
 
     const timeouts: NodeJS.Timeout[] = [];
@@ -141,7 +161,7 @@ Starting data analysis...`,
           'Gathering cost, click, and conversion metrics'
         ]
       });
-      setSystemMessage('Collecting campaign data...');
+      updateSystemLog('Collecting campaign data...');
     }, 1500));
 
     // Step 2: Analysis
@@ -157,7 +177,7 @@ Starting data analysis...`,
           'Calculating potential cost savings for each negative keyword'
         ]
       });
-      setSystemMessage('Analyzing performance patterns...');
+      updateSystemLog('Analyzing performance patterns...');
     }, 3000));
 
     // Step 3: Identification
@@ -173,7 +193,7 @@ Starting data analysis...`,
           'Validating against your product catalog'
         ]
       });
-      setSystemMessage('Identifying optimization opportunities...');
+      updateSystemLog('Identifying optimization opportunities...');
     }, 4500));
 
     // Step 4: Recommendations
@@ -189,7 +209,7 @@ Starting data analysis...`,
           'Generating performance impact projections'
         ]
       });
-      setSystemMessage('Generating recommendations...');
+      updateSystemLog('Generating recommendations...');
     }, 6000));
 
     // Step 5: Results with CSV data
@@ -223,7 +243,7 @@ Key Findings:
         csvContentData: csvContent,
         showApprovalButtons: true
       });
-      setSystemMessage('Analysis complete - Ready for next steps');
+      updateSystemLog('Analysis complete - Ready for next steps');
       setIsProcessing(false);
     }, 7500));
 
@@ -249,7 +269,7 @@ How to get this data from Google Ads:
 
 Once you upload the file, I'll analyze it and provide negative keyword recommendations.`,
       });
-      setSystemMessage('Ready to analyze your uploaded data');
+      updateSystemLog('Ready to analyze your uploaded data');
       setIsProcessing(false);
     }, 1500);
   };
@@ -284,7 +304,7 @@ Expected impact:
 • Improved CTR: +0.8%
 • Better conversion rates: +12%`,
       });
-      setSystemMessage('Implementation in progress');
+      updateSystemLog('Implementation in progress');
     }, 1500);
   };
 
@@ -311,7 +331,7 @@ Expected impact:
 
 Just type your feedback below and I'll refine the recommendations accordingly.`,
       });
-      setSystemMessage('Waiting for your feedback');
+      updateSystemLog('Waiting for your feedback');
     }, 1500);
   };
 
@@ -360,7 +380,7 @@ Just type your feedback below and I'll refine the recommendations accordingly.`,
 
       const userResponse = newMessage;
       setNewMessage('');
-      setSystemMessage('Analyzing your responses and creating a personalized plan...');
+      updateSystemLog('Analyzing your responses and creating a personalized plan...');
       setIsProcessing(true);
 
       // Store the user's answers
@@ -411,7 +431,7 @@ Would you like me to dive deeper into any of these strategies or help you implem
         setQueryFlowStep(0);
         setCurrentQueryContext('');
         setUserAnswers([]);
-        setSystemMessage('Ready for your next question');
+        updateSystemLog('Ready for your next question');
         setIsProcessing(false);
       }, 3000);
 
@@ -425,7 +445,7 @@ Would you like me to dive deeper into any of these strategies or help you implem
     setAttachedFiles([]);
     
     setNewMessage('');
-    setSystemMessage('Processing your request...');
+    updateSystemLog('Processing your request...');
     setIsProcessing(true);
 
     setTimeout(() => {
@@ -433,7 +453,7 @@ Would you like me to dive deeper into any of these strategies or help you implem
         type: 'assistant',
         content: 'Here is a simulated response to your message.',
       });
-      setSystemMessage('Ready for your next question');
+      updateSystemLog('Ready for your next question');
       setIsProcessing(false);
     }, 2000);
   };
@@ -697,9 +717,17 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
               ) : (
                 <div className="w-2 h-2 rounded-full bg-[#22C55E]" />
               )}
-              <span className="text-sm text-[#FF7F50] font-medium">
-                {systemMessage}
-              </span>
+              <div className="flex items-center justify-between w-full">
+                <span className="text-sm text-[#FF7F50] font-medium">
+                  {systemLog}
+                </span>
+                <button
+                  onClick={() => setShowLogHistoryPanel(true)}
+                  className="text-xs text-gray-500 hover:text-[#FF7F50] transition-colors underline"
+                >
+                  View History
+                </button>
+              </div>
             </div>
 
             <div className="relative bg-white rounded-b-2xl shadow-sm">
@@ -762,6 +790,13 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
           </div>
         </div>
       </div>
+
+      {/* System Log History Panel */}
+      <SystemLogHistoryPanel
+        logHistory={systemLogHistory}
+        isOpen={showLogHistoryPanel}
+        onClose={() => setShowLogHistoryPanel(false)}
+      />
     </div>
   );
 };
