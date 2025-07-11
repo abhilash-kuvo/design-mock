@@ -337,6 +337,39 @@ Just type your feedback below and I'll refine the recommendations accordingly.`,
     }, 1500);
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handleFileAttachment = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const newFiles: AttachedFile[] = files.map(file => ({
+      id: Math.random().toString(36).substr(2, 9),
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      file: file
+    }));
+    
+    setAttachedFiles(prev => [...prev, ...newFiles]);
+    
+    // Clear the input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveFile = (fileId: string) => {
+    setAttachedFiles(prev => prev.filter(file => file.id !== fileId));
+  };
+
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
 
