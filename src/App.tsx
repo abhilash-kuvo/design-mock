@@ -13,7 +13,6 @@ const AppContent: React.FC = () => {
   const { auth } = useAuth();
   const [currentView, setCurrentView] = React.useState<'agentRun' | 'chat' | 'myPlaybooks' | 'playbookDetails' | 'library' | 'connectedAccounts'>('myPlaybooks'); // Changed default from 'library' to 'myPlaybooks'
   const [currentQuery, setCurrentQuery] = React.useState('');
-  const [currentFiles, setCurrentFiles] = React.useState<File[]>([]);
   const [selectedPlaybookId, setSelectedPlaybookId] = React.useState<string>('');
   const [isViewingPlaybookFromLibrary, setIsViewingPlaybookFromLibrary] = React.useState(false);
   const [showCloneSuccessOnDetails, setShowCloneSuccessOnDetails] = React.useState(false);
@@ -27,19 +26,16 @@ const AppContent: React.FC = () => {
   const handleNewPlaybook = () => {
     setCurrentView('agentRun');
     setRunningPlaybookId('');
-    setCurrentFiles([]);
   };
 
   const handleMyPlaybooks = () => {
     setCurrentView('myPlaybooks');
     setRunningPlaybookId('');
-    setCurrentFiles([]);
   };
 
   const handleLibrary = () => {
     setCurrentView('library');
     setRunningPlaybookId('');
-    setCurrentFiles([]);
   };
 
   const handleNavigateToConnectedAccounts = () => {
@@ -88,7 +84,6 @@ const AppContent: React.FC = () => {
     // Set the running playbook ID and navigate to chat
     setRunningPlaybookId(playbookId);
     setCurrentQuery(`Running playbook: ${playbookTitle}`);
-    setCurrentFiles([]);
     setCurrentView('chat');
   };
 
@@ -106,7 +101,6 @@ const AppContent: React.FC = () => {
     setIsViewingPlaybookFromLibrary(false);
     setShowCloneSuccessOnDetails(false);
     setRunningPlaybookId('');
-    setCurrentFiles([]);
   };
 
   const handleBackFromChat = () => {
@@ -117,7 +111,6 @@ const AppContent: React.FC = () => {
       // Otherwise go back to agent run page
       setCurrentView('agentRun');
     }
-    setCurrentFiles([]);
   };
 
   if (currentView === 'connectedAccounts') {
@@ -176,7 +169,6 @@ const AppContent: React.FC = () => {
     return (
       <ChatPage 
         initialQuery={currentQuery} 
-        initialFiles={currentFiles}
         runningPlaybookId={runningPlaybookId}
         onBack={handleBackFromChat}
         onNewPlaybook={handleNewPlaybook}
@@ -188,9 +180,8 @@ const AppContent: React.FC = () => {
 
   return (
     <BuildPage 
-      onSubmit={(query, files) => {
+      onSubmit={(query) => {
         setCurrentQuery(query);
-        setCurrentFiles(files || []);
         setRunningPlaybookId('');
         setCurrentView('chat');
       }}

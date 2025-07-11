@@ -31,7 +31,6 @@ interface Message {
 
 interface ChatPageProps {
   initialQuery: string;
-  initialFiles?: File[];
   runningPlaybookId?: string;
   onBack: () => void;
   onNewPlaybook: () => void;
@@ -41,7 +40,6 @@ interface ChatPageProps {
 
 const ChatPage: React.FC<ChatPageProps> = ({ 
   initialQuery, 
-  initialFiles = [],
   runningPlaybookId,
   onBack, 
   onNewPlaybook, 
@@ -61,16 +59,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
 
   // File attachment state
-  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>(() => {
-    // Convert initial files to AttachedFile format
-    return initialFiles.map(file => ({
-      id: Math.random().toString(36).substr(2, 9),
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      file: file,
-    }));
-  });
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mock playbook data for display
