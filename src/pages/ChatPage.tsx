@@ -547,9 +547,6 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
   };
 
   const getPlaceholderText = () => {
-    if (queryFlowStep === 1) {
-      return "Answer the 3 questions above to get your personalized scaling plan...";
-    }
     return "Type your message...";
   };
 
