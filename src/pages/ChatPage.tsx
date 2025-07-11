@@ -736,29 +736,15 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                         {/* Render download files */}
                         {message.downloadFiles && message.downloadFiles.length > 0 && (
                           <div className="mt-4 pt-4 border-t border-gray-200">
-                            <div className="mb-3">
-                              <h4 className="text-sm font-medium text-gray-700 mb-1">Generated Reports</h4>
-                              <p className="text-xs text-gray-500">Click to download your personalized analysis files</p>
-                            </div>
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                               {message.downloadFiles.map((file) => (
-                                <div key={file.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
-                                  <div className="flex-shrink-0 mt-0.5">
-                                    <FileChip
-                                      fileName={file.name}
-                                      onClick={() => handleDownload(file.name)}
-                                      type="download"
-                                      className="cursor-pointer"
-                                    />
-                                  </div>
-                                  {file.description && (
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs text-gray-600 leading-relaxed mt-1">
-                                        {file.description}
-                                      </p>
-                                    </div>
-                                  )}
-                                </div>
+                                <FileChip
+                                  key={file.id}
+                                  fileName={file.name}
+                                  onClick={() => handleDownload(file.name)}
+                                  type="download"
+                                  className="cursor-pointer"
+                                />
                               ))}
                             </div>
                           </div>
