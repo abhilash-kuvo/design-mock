@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRef } from 'react';
+import { useRef, useCallback } from 'react';
 import { ArrowRight, Paperclip, Loader2, Play, ChevronDown, ChevronUp, CheckCircle, MessageSquare, Shield, ExternalLink, Upload } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import AgentSelector from '../components/dashboard/AgentSelector';
@@ -36,6 +36,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [currentQueryContext, setCurrentQueryContext] = useState('');
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
 
+  // Track if we've already processed the initial query to prevent loops
+  const hasProcessedInitialQuery = useRef(false);
+
   // File attachment state
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,7 +65,15 @@ const ChatPage: React.FC<ChatPageProps> = ({
   };
 
   useEffect(() => {
+    // Prevent processing if we've already handled the initial query
+    if (hasProcessedInitialQuery.current) {
+      return;
+    }
+
     if (initialQuery) {
+      // Mark that we're processing the initial query
+      hasProcessedInitialQuery.current = true;
+
       // If running a playbook, show authentication flow first
       if (runningPlaybookId) {
         const playbookTitle = getPlaybookTitle(runningPlaybookId);
@@ -92,11 +103,8 @@ const ChatPage: React.FC<ChatPageProps> = ({
           timeouts.forEach(timeout => clearTimeout(timeout));
         };
       } else {
-        // For regular queries, check if we already have messages from BuildPage
-        // If not, add the initial query
-        if (messages.length === 0) {
-          addUserMessage(initialQuery);
-        }
+        // For regular queries, the message should already be in context from BuildPage
+        // Just add the assistant response
 
         // Check if this is an Amazon scaling query
         if (isAmazonScalingQuery(initialQuery)) {
@@ -128,7 +136,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
         }
       }
     }
-  }, [initialQuery, runningPlaybookId, messages.length, addMessage, addUserMessage, setMessages]);
+  }, [initialQuery, runningPlaybookId, addMessage, setMessages]);
 
   const handleGoogleAdsAuth = () => {
     // Hide the auth panel by marking auth as completed
