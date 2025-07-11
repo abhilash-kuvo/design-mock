@@ -100,6 +100,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
           if (isAmazonScalingQuery(initialQuery)) {
             setCurrentQueryContext(initialQuery);
             setQueryFlowStep(1);
+            setSystemMessage('Analyzing your request...');
             
             const timeout = setTimeout(() => {
               addMessage({
