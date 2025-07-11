@@ -1,7 +1,7 @@
 import React from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import LoginPage from './pages/LoginPage';
-import AgentRunPage from './pages/AgentRunPage';
+import BuildPage from './pages/BuildPage';
 import ChatPage from './pages/ChatPage';
 import MyPlaybooksPage from './pages/MyPlaybooksPage';
 import PlaybookDetailsPage from './pages/PlaybookDetailsPage';
@@ -179,7 +179,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <AgentRunPage 
+    <BuildPage 
       onSubmit={(query) => {
         setCurrentQuery(query);
         setRunningPlaybookId('');
