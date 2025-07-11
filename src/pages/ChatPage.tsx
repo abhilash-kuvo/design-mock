@@ -6,7 +6,7 @@ import Sidebar from '../components/dashboard/Sidebar';
 import AgentSelector from '../components/dashboard/AgentSelector';
 import FileChip from '../components/ui/FileChip';
 import CsvDataTable from '../components/ui/CsvDataTable';
-import SystemLogHistoryPanel from '../components/SystemLogHistoryPanel';
+import BottomDrawerLogs from '../components/BottomDrawerLogs';
 import { useChat, AttachedFile, ChatMessage } from '../contexts/ChatContext';
 
 interface SystemLogEntry {
@@ -38,7 +38,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [isProcessing, setIsProcessing] = useState(true);
   const [authCompleted, setAuthCompleted] = useState(false);
   const [systemLogHistory, setSystemLogHistory] = useState<SystemLogEntry[]>([]);
-  const [showLogHistoryPanel, setShowLogHistoryPanel] = useState(false);
+  const [showLogDrawer, setShowLogDrawer] = useState(false);
   const { messages, setMessages, addMessage, addUserMessage } = useChat();
   
   // Q&A Flow State
@@ -777,7 +777,7 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                   {systemLog}
                 </span>
                 <button
-                  onClick={() => setShowLogHistoryPanel(true)}
+                  onClick={() => setShowLogDrawer(true)}
                   className="text-xs text-gray-500 hover:text-[#FF7F50] transition-colors underline"
                 >
                   View Logs
@@ -846,11 +846,11 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
         </div>
       </div>
 
-      {/* System Log History Panel */}
-      <SystemLogHistoryPanel
+      {/* Bottom Drawer Logs */}
+      <BottomDrawerLogs
         logHistory={systemLogHistory}
-        isOpen={showLogHistoryPanel}
-        onClose={() => setShowLogHistoryPanel(false)}
+        isOpen={showLogDrawer}
+        onClose={() => setShowLogDrawer(false)}
       />
     </div>
   );
