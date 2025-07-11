@@ -53,14 +53,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
     return playbooks[playbookId] || 'Unknown Playbook';
   };
 
-  // Check if query is about Amazon ads scaling
-  const isAmazonScalingQuery = (query: string) => {
-    const lowerQuery = query.toLowerCase();
-    return (lowerQuery.includes('amazon') && 
-            (lowerQuery.includes('scale') || lowerQuery.includes('scaling') || 
-             lowerQuery.includes('opportunities') || lowerQuery.includes('grow')));
-  };
-
   useEffect(() => {
     if (initialQuery) {
       // If running a playbook, show authentication flow first
@@ -92,39 +84,25 @@ const ChatPage: React.FC<ChatPageProps> = ({
           timeouts.forEach(timeout => clearTimeout(timeout));
         };
       } else {
-        // For regular queries, only add initial response if we don't have any assistant messages yet
+        // For all regular queries, trigger Amazon Ads scaling Q&A flow
         const hasAssistantMessages = messages.some(msg => msg.type === 'assistant');
         
         if (!hasAssistantMessages) {
-          // Check if this is an Amazon scaling query
-          if (isAmazonScalingQuery(initialQuery)) {
-            setCurrentQueryContext(initialQuery);
-            setQueryFlowStep(1);
-            setSystemMessage('Analyzing your request...');
-            
-            const timeout = setTimeout(() => {
-              addMessage({
-                type: 'assistant',
-                content: `Great! I'll help you identify scaling opportunities for your Amazon ads. To provide the most relevant recommendations, I need to understand your current situation better.\n\nPlease answer these 3 questions:\n\n1. What's your current monthly Amazon ads spend?\n   (e.g., $5,000, $25,000, $100,000+)\n\n2. What's your primary goal for scaling?\n   (e.g., Increase sales volume, Improve ACoS, Expand to new products, Enter new markets)\n\n3. What's your biggest current challenge with Amazon ads?\n   (e.g., High ACoS, Limited inventory, Competition, Keyword research, Campaign structure)\n\nYou can answer all three questions in one message, or answer them one by one.`,
-              });
-              setSystemMessage('Waiting for your answers to create a personalized plan');
-              setIsProcessing(false);
-            }, 2000);
+          // All queries trigger Amazon Ads scaling Q&A flow
+          setCurrentQueryContext(initialQuery);
+          setQueryFlowStep(1);
+          setSystemMessage('Analyzing your request...');
+          
+          const timeout = setTimeout(() => {
+            addMessage({
+              type: 'assistant',
+              content: `Great! I'll help you identify scaling opportunities for your Amazon ads. To provide the most relevant recommendations, I need to understand your current situation better.\n\nPlease answer these 3 questions:\n\n1. What's your current monthly Amazon ads spend?\n   (e.g., $5,000, $25,000, $100,000+)\n\n2. What's your primary goal for scaling?\n   (e.g., Increase sales volume, Improve ACoS, Expand to new products, Enter new markets)\n\n3. What's your biggest current challenge with Amazon ads?\n   (e.g., High ACoS, Limited inventory, Competition, Keyword research, Campaign structure)\n\nYou can answer all three questions in one message, or answer them one by one.`,
+            });
+            setSystemMessage('Waiting for your answers to create a personalized plan');
+            setIsProcessing(false);
+          }, 2000);
 
-            return () => clearTimeout(timeout);
-          } else {
-            // Standard response for non-Amazon scaling queries
-            const timeout = setTimeout(() => {
-              addMessage({
-                type: 'assistant',
-                content: 'I analyzed the Twitter and Reddit discussions in the Amazon ads industry from this week. Here are the top three trending topics:\n\n1. Increased CPCs across multiple categories\n2. New AI-powered targeting features\n3. Updates to attribution windows',
-              });
-              setSystemMessage('Ready for your next question');
-              setIsProcessing(false);
-            }, 2000);
-
-            return () => clearTimeout(timeout);
-          }
+          return () => clearTimeout(timeout);
         }
       }
     }
