@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { ArrowRight, Paperclip } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import AgentSelector from '../components/dashboard/AgentSelector';
