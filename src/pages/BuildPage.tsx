@@ -6,7 +6,7 @@ import UserProfileDropdown from '../components/layout/UserProfileDropdown';
 import FileChip from '../components/ui/FileChip';
 
 interface BuildPageProps {
-   onSubmit: (query: string) => void;
+  onSubmit: (query: string, files?: File[]) => void;
    onNewPlaybook: () => void;
    onMyPlaybooks: () => void;
 }
@@ -29,7 +29,7 @@ const BuildPage: React.FC<BuildPageProps> = ({
     
     setIsLoading(true);
     try {
-      await onSubmit(query);
+      await onSubmit(query, attachedFiles);
     } finally {
       setIsLoading(false);
     }
