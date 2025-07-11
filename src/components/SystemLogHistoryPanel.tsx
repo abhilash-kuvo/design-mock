@@ -103,7 +103,18 @@ const SystemLogHistoryPanel: React.FC<SystemLogHistoryPanelProps> = ({
                           key={log.id}
                           className="bg-gray-50 rounded-lg p-3 border border-gray-100"
                         >
-                          <div className="flex items-center space-x-2 text-sm text-[#333333]">
+                          <div className="flex items-start space-x-2 text-sm text-[#333333]">
+                            <Clock size={14} className="text-gray-400 mt-0.5 flex-shrink-0" />
+                            <div className="flex-1">
+                              <div className="text-xs text-gray-500 font-medium mb-1">
+                                {formatTime(log.timestamp)}
+                              </div>
+                              <div className="leading-relaxed">
+                                {log.message}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                             <span className="text-xs text-gray-500 font-medium">
                               {formatTime(log.timestamp)}
                             </span>
