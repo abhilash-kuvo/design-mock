@@ -115,15 +115,6 @@ const SystemLogHistoryPanel: React.FC<SystemLogHistoryPanelProps> = ({
                             </div>
                           </div>
                         </div>
-                            <span className="text-xs text-gray-500 font-medium">
-                              {formatTime(log.timestamp)}
-                            </span>
-                            <span className="text-gray-400">-</span>
-                            <span className="leading-relaxed">
-                              {log.message}
-                            </span>
-                          </div>
-                        </div>
                       ))}
                   </div>
                 </div>
