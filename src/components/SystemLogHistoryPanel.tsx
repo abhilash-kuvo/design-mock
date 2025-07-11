@@ -65,7 +65,7 @@ const SystemLogHistoryPanel: React.FC<SystemLogHistoryPanelProps> = ({
           </button>
         </div>
         <p className="text-sm text-gray-600 mt-1">
-          Complete history of system activities
+          System activities will appear here as they occur
         </p>
       </div>
 
@@ -108,15 +108,15 @@ const SystemLogHistoryPanel: React.FC<SystemLogHistoryPanelProps> = ({
                               <div className="w-2 h-2 bg-[#FF7F50] rounded-full"></div>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm text-[#333333] leading-relaxed">
-                                {log.message}
-                              </p>
-                              <div className="flex items-center space-x-1 mt-2">
+                              <div className="flex items-center space-x-2 mb-1">
                                 <Clock size={12} className="text-gray-400" />
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs font-medium text-gray-500">
                                   {formatTime(log.timestamp)}
                                 </span>
                               </div>
+                              <p className="text-sm text-[#333333] leading-relaxed">
+                                {log.message}
+                              </p>
                             </div>
                           </div>
                         </div>
