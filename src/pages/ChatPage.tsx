@@ -788,7 +788,7 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                   onClick={() => setShowLogHistoryPanel(true)}
                   className="text-xs text-gray-500 hover:text-[#FF7F50] transition-colors underline"
                 >
-                  View History
+                  View Logs
                 </button>
               </div>
             </div>
