@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ArrowRight, Paperclip } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import AgentSelector from '../components/dashboard/AgentSelector';
 import PlaybookTile from '../components/dashboard/PlaybookTile';
 import UserProfileDropdown from '../components/layout/UserProfileDropdown';
+import FileChip from '../components/ui/FileChip';
+
+interface AttachedFile {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  file: File;
+}
 
 interface AgentRunPageProps {
   onSubmit: (query: string) => void;
@@ -22,6 +32,8 @@ const AgentRunPage: React.FC<AgentRunPageProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
     if (query.trim()) {
@@ -38,6 +50,34 @@ const AgentRunPage: React.FC<AgentRunPageProps> = ({
 
   const handlePlaybookClick = (playbook: string) => {
     setQuery(playbook);
+  };
+
+  const handleFileAttachment = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    const newFiles: AttachedFile[] = Array.from(files).map(file => ({
+      id: Math.random().toString(36).substr(2, 9),
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      file: file,
+    }));
+
+    setAttachedFiles(prev => [...prev, ...newFiles]);
+    
+    // Reset the input value so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveFile = (fileId: string) => {
+    setAttachedFiles(prev => prev.filter(file => file.id !== fileId));
   };
 
   return (
@@ -66,6 +106,22 @@ const AgentRunPage: React.FC<AgentRunPageProps> = ({
             {/* Chat Window with integrated Agent Selector */}
             <div className="bg-white rounded-2xl shadow-sm">
               <div className="relative p-4">
+                {/* Attached Files Display */}
+                {attachedFiles.length > 0 && (
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    {attachedFiles.map((file) => (
+                      <FileChip
+                        key={file.id}
+                        fileName={file.name}
+                        size={file.size}
+                        type="attachment"
+                        onClick={() => handleRemoveFile(file.id)}
+                        className="cursor-pointer hover:bg-red-50 hover:border-red-200"
+                      />
+                    ))}
+                  </div>
+                )}
+
                 <textarea
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -80,7 +136,11 @@ const AgentRunPage: React.FC<AgentRunPageProps> = ({
                   
                   {/* Action buttons - Right aligned */}
                   <div className="flex items-center space-x-2">
-                    <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                    <button 
+                      onClick={handleFileAttachment}
+                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                      title="Attach files"
+                    >
                       <Paperclip size={20} />
                     </button>
                     <button 
@@ -93,6 +153,16 @@ const AgentRunPage: React.FC<AgentRunPageProps> = ({
                   </div>
                 </div>
               </div>
+              
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+                accept=".pdf,.doc,.docx,.txt,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.gif,.zip"
+              />
             </div>
 
             {/* Text Cue for Playbook Tiles */}

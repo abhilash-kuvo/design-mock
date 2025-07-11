@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowRight, Paperclip, Loader2, Play, ChevronDown, ChevronUp, CheckCircle, MessageSquare, Shield, ExternalLink, Upload } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import AgentSelector from '../components/dashboard/AgentSelector';
 import FileChip from '../components/ui/FileChip';
 import CsvDataTable from '../components/ui/CsvDataTable';
+
+interface AttachedFile {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  file: File;
+}
 
 interface Message {
   id: string;
@@ -48,6 +57,10 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [queryFlowStep, setQueryFlowStep] = useState(0);
   const [currentQueryContext, setCurrentQueryContext] = useState('');
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
+
+  // File attachment state
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mock playbook data for display
   const getPlaybookTitle = (playbookId: string) => {
@@ -481,6 +494,34 @@ Would you like me to dive deeper into any of these strategies or help you implem
     }
   };
 
+  const handleFileAttachment = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    const newFiles: AttachedFile[] = Array.from(files).map(file => ({
+      id: Math.random().toString(36).substr(2, 9),
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      file: file,
+    }));
+
+    setAttachedFiles(prev => [...prev, ...newFiles]);
+    
+    // Reset the input value so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveFile = (fileId: string) => {
+    setAttachedFiles(prev => prev.filter(file => file.id !== fileId));
+  };
+
   const toggleMessageDetails = (messageId: string) => {
     setMessages(prev => prev.map(msg => 
       msg.id === messageId 
@@ -722,6 +763,22 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
             </div>
 
             <div className="relative bg-white rounded-b-2xl shadow-sm">
+              {/* Attached Files Display */}
+              {attachedFiles.length > 0 && (
+                <div className="p-4 pb-0 flex flex-wrap gap-2">
+                  {attachedFiles.map((file) => (
+                    <FileChip
+                      key={file.id}
+                      fileName={file.name}
+                      size={file.size}
+                      type="attachment"
+                      onClick={() => handleRemoveFile(file.id)}
+                      className="cursor-pointer hover:bg-red-50 hover:border-red-200"
+                    />
+                  ))}
+                </div>
+              )}
+
               <textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
@@ -735,8 +792,10 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                 
                 <div className="flex items-center space-x-2">
                   <button 
+                    onClick={handleFileAttachment}
                     className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
                     disabled={isProcessing}
+                    title="Attach files"
                   >
                     <Paperclip size={20} />
                   </button>
@@ -750,6 +809,16 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                 </div>
               </div>
             </div>
+            
+            {/* Hidden File Input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+              accept=".pdf,.doc,.docx,.txt,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.gif,.zip"
+            />
           </div>
         </div>
       </div>
