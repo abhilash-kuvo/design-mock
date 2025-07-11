@@ -1,28 +1,21 @@
 import React from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { ChatProvider } from './contexts/ChatContext';
-import LoginPage from './pages/LoginPage';
 import BuildPage from './pages/BuildPage';
 import ChatPage from './pages/ChatPage';
 import MyPlaybooksPage from './pages/MyPlaybooksPage';
 import PlaybookDetailsPage from './pages/PlaybookDetailsPage';
 import LibraryPage from './pages/LibraryPage';
 import ConnectedAccountsPage from './pages/ConnectedAccountsPage';
-import { useAuth } from './contexts/AuthContext';
 
 const AppContent: React.FC = () => {
-  const { auth } = useAuth();
-  const [currentView, setCurrentView] = React.useState<'agentRun' | 'chat' | 'myPlaybooks' | 'playbookDetails' | 'library' | 'connectedAccounts'>('myPlaybooks'); // Changed default from 'library' to 'myPlaybooks'
+  const [currentView, setCurrentView] = React.useState<'agentRun' | 'chat' | 'myPlaybooks' | 'playbookDetails' | 'library' | 'connectedAccounts'>('agentRun'); // Start directly on BuildPage
   const [currentQuery, setCurrentQuery] = React.useState('');
   const [selectedPlaybookId, setSelectedPlaybookId] = React.useState<string>('');
   const [isViewingPlaybookFromLibrary, setIsViewingPlaybookFromLibrary] = React.useState(false);
   const [showCloneSuccessOnDetails, setShowCloneSuccessOnDetails] = React.useState(false);
   const [runningPlaybookId, setRunningPlaybookId] = React.useState<string>('');
-  const [previousView, setPreviousView] = React.useState<'agentRun' | 'chat' | 'myPlaybooks' | 'playbookDetails' | 'library'>('myPlaybooks'); // Changed default from 'library' to 'myPlaybooks'
-
-  if (!auth.isLoggedIn) {
-    return <LoginPage />;
-  }
+  const [previousView, setPreviousView] = React.useState<'agentRun' | 'chat' | 'myPlaybooks' | 'playbookDetails' | 'library'>('agentRun'); // Start on BuildPage
 
   const handleNewPlaybook = () => {
     setCurrentView('agentRun');

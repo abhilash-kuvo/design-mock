@@ -11,8 +11,13 @@ interface AuthContextType {
 }
 
 const initialState: AuthState = {
-  isLoggedIn: false,
-  user: null,
+  isLoggedIn: true,
+  user: {
+    id: 'dummy-user-1',
+    email: 'user@example.com',
+    name: 'John Doe',
+    avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=2'
+  },
   loading: false,
   error: null,
   verificationStep: 'email',
@@ -36,60 +41,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const logout = () => {
+    // Dummy logout - just reset to initial logged-in state
+    console.log('Logout clicked (dummy implementation)');
     setAuth(initialState);
   };
 
   const startEmailLogin = (email: string) => {
-    setAuth({
-      ...auth,
-      email,
-      verificationStep: 'otp',
-      loading: false,
-      error: null,
-    });
+    // Dummy implementation - do nothing
+    console.log('Start email login called (dummy implementation):', email);
   };
 
   const verifyOtp = async (otp: string): Promise<boolean> => {
-    try {
-      setAuth({ ...auth, loading: true, error: null });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (otp === '000000') {
-        setAuth({
-          ...auth,
-          loading: false,
-          error: 'Invalid OTP. Please try again.',
-        });
-        return false;
-      }
-      
-      // For demo purposes, accept any other 6-digit OTP
-      const isValid = /^\d{6}$/.test(otp);
-      
-      if (isValid) {
-        login({
-          id: '1',
-          email: auth.email,
-        });
-        return true;
-      } else {
-        setAuth({
-          ...auth,
-          loading: false,
-          error: 'Please enter a valid 6-digit OTP.',
-        });
-        return false;
-      }
-    } catch (error) {
-      setAuth({
-        ...auth,
-        loading: false,
-        error: 'An error occurred. Please try again.',
-      });
-      return false;
-    }
+    // Dummy implementation - always return true
+    console.log('Verify OTP called (dummy implementation):', otp);
+    return true;
   };
 
   return (
