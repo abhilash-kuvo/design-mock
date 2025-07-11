@@ -83,11 +83,7 @@ const BuildPage: React.FC<BuildPageProps> = ({
 
   const quickActions = [
     'Analyze my Google Ads campaigns and recommend negative keywords',
-    'Find scaling opportunities in my Amazon Ads account',
-    'Identify ad fatigue in my Meta campaigns',
-    'Optimize my Google Shopping product feeds',
-    'Research high-converting keywords for Amazon PPC',
-    'Analyze competitor advertising strategies'
+    'Find scaling opportunities in my Amazon Ads account'
   ];
 
   return (
