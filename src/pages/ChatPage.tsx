@@ -575,14 +575,6 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                 </span>
               </div>
             )}
-            {queryFlowStep === 1 && (
-              <div className="flex items-center space-x-2">
-                <MessageSquare size={16} className="text-blue-500" />
-                <span className="text-sm font-medium text-blue-700">
-                  Q&A Mode: Amazon Ads Scaling
-                </span>
-              </div>
-            )}
           </div>
           <button 
             onClick={onNavigateToConnectedAccounts}
