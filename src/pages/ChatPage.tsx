@@ -94,11 +94,52 @@ const ChatPage: React.FC<ChatPageProps> = ({
           addMessage({
             type: 'auth',
             content: 'This playbook requires access to your Google Ads account to analyze campaign data and implement recommendations.',
-            showAuthButtons: true,
+            content: `🎯 Amazon Ads Scaling Analysis Complete!
+
+I've analyzed your Amazon advertising data and identified key scaling opportunities. Here's what I found:
+
+📊 **Key Findings:**
+• 23 high-potential keywords for campaign expansion
+• 8 underperforming campaigns ready for optimization  
+• 15 new product targeting opportunities
+• Estimated 35% revenue increase potential
+
+💰 **Projected Impact:**
+• Monthly revenue increase: $12,500 - $18,750
+• ACoS improvement: 15-22% reduction
+• Impression share growth: +28%
+
+📁 **Detailed reports are ready for download below:**`,
+            hasDownload: true,
+            downloadFileName: "amazon-scaling-opportunities.xlsx"
           });
+          
+          // Add additional download files
+          setTimeout(() => {
+            addMessage({
+              type: 'assistant',
+              content: `📈 **Campaign Performance Analysis**
+
+Detailed breakdown of your current campaign performance with specific recommendations for each campaign.`,
+              hasDownload: true,
+              downloadFileName: "campaign-performance-analysis.pdf"
+            });
+          }, 500);
+          
+          setTimeout(() => {
+            addMessage({
+              type: 'assistant',
+              content: `🔍 **Keyword Research Report**
+
+Comprehensive list of high-converting keywords with search volume, competition data, and bid recommendations.`,
+              hasDownload: true,
+              downloadFileName: "keyword-research-report.csv"
+            });
+          }, 1000);
+          
           updateSystemLog('Authentication required');
           setIsProcessing(false);
-        }, 1500));
+        }, 3000);
 
         return () => {
           timeouts.forEach(timeout => clearTimeout(timeout));
