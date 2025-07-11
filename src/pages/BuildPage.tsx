@@ -165,18 +165,12 @@ const BuildPage: React.FC<BuildPageProps> = ({
                   <button 
                     onClick={handleSubmit}
                     disabled={!query.trim() || isProcessing}
-                    className="px-6 py-3 bg-[#FF7F50] text-white rounded-full hover:bg-[#E67348] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    className="p-3 bg-[#FF7F50] text-white rounded-full hover:bg-[#E67348] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isProcessing ? (
-                      <>
-                        <Loader2 size={20} className="animate-spin" />
-                        <span>Processing...</span>
-                      </>
+                      <Loader2 size={20} className="animate-spin" />
                     ) : (
-                      <>
-                        <span>Build Agent</span>
-                        <ArrowRight size={20} />
-                      </>
+                      <ArrowRight size={20} />
                     )}
                   </button>
                 </div>
