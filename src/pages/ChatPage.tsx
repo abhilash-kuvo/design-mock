@@ -736,15 +736,27 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                         {/* Render download files */}
                         {message.downloadFiles && message.downloadFiles.length > 0 && (
                           <div className="mt-4 pt-4 border-t border-gray-200">
-                            <div className="space-y-1.5">
+                            <div className="space-y-2">
                               {message.downloadFiles.map((file) => (
-                                <FileChip
-                                  key={file.id}
-                                  fileName={file.name}
-                                  onClick={() => handleDownload(file.name)}
-                                  type="download"
-                                  className="cursor-pointer"
-                                />
+                                <div key={file.id} className="flex items-center justify-between">
+                                  <div className="flex-1 min-w-0 mr-3">
+                                    <div className="text-sm font-medium text-gray-900 truncate">
+                                      {file.name}
+                                    </div>
+                                    {file.description && (
+                                      <div className="text-xs text-gray-500 mt-0.5">
+                                        {file.description}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <button
+                                    onClick={() => handleDownload(file.name)}
+                                    className="flex items-center space-x-1 px-3 py-1.5 text-sm text-[#FF7F50] hover:bg-[#FFF5F2] rounded-lg transition-colors flex-shrink-0"
+                                  >
+                                    <Download size={14} />
+                                    <span>Download</span>
+                                  </button>
+                                </div>
                               ))}
                             </div>
                           </div>
