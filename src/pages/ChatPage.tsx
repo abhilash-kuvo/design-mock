@@ -117,6 +117,26 @@ const ChatPage: React.FC<ChatPageProps> = ({
             addMessage({
               type: 'assistant',
               content: `✅ Analysis Complete! I've successfully analyzed your request and identified key scaling opportunities for your Amazon ads.\n\nBased on your query "${currentQueryContext}", I've prepared a comprehensive scaling strategy that includes:\n\n• Campaign structure optimization recommendations\n• High-potential keyword expansion opportunities  \n• Budget reallocation strategies for maximum ROI\n• Performance-based bidding adjustments\n• Inventory velocity optimization tactics\n\nYour personalized Amazon ads scaling plan is ready! This strategy is designed to help you increase sales volume while maintaining or improving your current ACoS.\n\nWould you like me to dive deeper into any specific area, or shall we proceed with implementing these recommendations?`,
+              downloadFiles: [
+                {
+                  id: 'scaling-strategy-1',
+                  name: 'Amazon Ads Scaling Strategy Report.pdf',
+                  description: 'Comprehensive scaling strategy with actionable recommendations',
+                  type: 'pdf'
+                },
+                {
+                  id: 'keyword-opportunities-1',
+                  name: 'High-Potential Keywords Analysis.xlsx',
+                  description: 'Keyword expansion opportunities with search volume data',
+                  type: 'xlsx'
+                },
+                {
+                  id: 'budget-optimization-1',
+                  name: 'Budget Reallocation Plan.csv',
+                  description: 'Campaign-level budget optimization recommendations',
+                  type: 'csv'
+                }
+              ]
             });
             updateSystemLog('Analysis complete - Scaling strategy ready for review');
             setIsProcessing(false);
@@ -490,8 +510,12 @@ Would you like me to dive deeper into any of these strategies or help you implem
     // In a real app, this would trigger the actual file download
     console.log('Downloading file:', fileName);
     
-    // Create a mock CSV content for demonstration
-    const csvContent = `Search Term,Match Type,Impressions,Clicks,Cost,Conversions,Recommendation
+    // Create mock content based on file type for demonstration
+    let content = '';
+    let mimeType = 'text/plain';
+    
+    if (fileName.includes('.csv')) {
+      content = `Search Term,Match Type,Impressions,Clicks,Cost,Conversions,Recommendation
 free,Broad,1250,45,$450.00,0,Add as negative keyword - High Priority
 cheap,Phrase,890,32,$280.00,1,Add as negative keyword - High Priority
 tutorial,Exact,670,28,$220.00,0,Add as negative keyword - High Priority
@@ -499,8 +523,18 @@ download,Broad,540,19,$180.00,0,Add as negative keyword - High Priority
 review,Phrase,420,15,$120.00,2,Consider for broad match negative only
 comparison,Broad,380,12,$95.00,1,Monitor - may keep for awareness
 vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
+      mimeType = 'text/csv';
+    } else if (fileName.includes('.xlsx')) {
+      content = 'Keyword,Search Volume,Competition,CPC,Opportunity Score\namazon best seller,45000,High,$2.50,85\nproduct reviews,32000,Medium,$1.80,78\ntop rated,28000,Low,$1.20,92';
+      mimeType = 'text/csv'; // For demo purposes, we'll use CSV format
+    } else if (fileName.includes('.pdf')) {
+      content = 'Amazon Ads Scaling Strategy Report\n\nExecutive Summary:\nThis report contains comprehensive scaling recommendations for your Amazon advertising campaigns...\n\n1. Campaign Structure Optimization\n2. Keyword Expansion Strategy\n3. Budget Reallocation Plan';
+      mimeType = 'text/plain';
+    } else {
+      content = `Content for ${fileName}`;
+    }
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([content], { type: mimeType });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -698,6 +732,36 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                         {/* Render attached files for user messages */}
                         {message.type === 'user' && message.attachedFiles && (
                           renderAttachedFiles(message.attachedFiles)
+                        )}
+                        {/* Render download files */}
+                        {message.downloadFiles && message.downloadFiles.length > 0 && (
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <div className="mb-3">
+                              <h4 className="text-sm font-medium text-gray-700 mb-1">Generated Reports</h4>
+                              <p className="text-xs text-gray-500">Click to download your personalized analysis files</p>
+                            </div>
+                            <div className="space-y-2">
+                              {message.downloadFiles.map((file) => (
+                                <div key={file.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
+                                  <div className="flex-shrink-0 mt-0.5">
+                                    <FileChip
+                                      fileName={file.name}
+                                      onClick={() => handleDownload(file.name)}
+                                      type="download"
+                                      className="cursor-pointer"
+                                    />
+                                  </div>
+                                  {file.description && (
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-600 leading-relaxed mt-1">
+                                        {file.description}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         )}
                       </div>
                     )}

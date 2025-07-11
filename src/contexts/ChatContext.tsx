@@ -22,6 +22,14 @@ export interface ChatMessage {
   csvContentData?: string;
   showApprovalButtons?: boolean;
   showAuthButtons?: boolean;
+  downloadFiles?: DownloadFile[];
+}
+
+export interface DownloadFile {
+  id: string;
+  name: string;
+  description?: string;
+  type: 'pdf' | 'csv' | 'xlsx' | 'doc' | 'txt';
 }
 
 interface ChatContextType {
