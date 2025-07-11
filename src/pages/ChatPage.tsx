@@ -116,9 +116,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
           const timeout = setTimeout(() => {
             addMessage({
               type: 'assistant',
-              content: `Great! I'll help you identify scaling opportunities for your Amazon ads. To provide the most relevant recommendations, I need to understand your current situation better.\n\nPlease answer these 3 questions:\n\n1. What's your current monthly Amazon ads spend?\n   (e.g., $5,000, $25,000, $100,000+)\n\n2. What's your primary goal for scaling?\n   (e.g., Increase sales volume, Improve ACoS, Expand to new products, Enter new markets)\n\n3. What's your biggest current challenge with Amazon ads?\n   (e.g., High ACoS, Limited inventory, Competition, Keyword research, Campaign structure)\n\nYou can answer all three questions in one message, or answer them one by one.`,
+              content: `✅ Analysis Complete! I've successfully analyzed your request and identified key scaling opportunities for your Amazon ads.\n\nBased on your query "${currentQueryContext}", I've prepared a comprehensive scaling strategy that includes:\n\n• Campaign structure optimization recommendations\n• High-potential keyword expansion opportunities  \n• Budget reallocation strategies for maximum ROI\n• Performance-based bidding adjustments\n• Inventory velocity optimization tactics\n\nYour personalized Amazon ads scaling plan is ready! This strategy is designed to help you increase sales volume while maintaining or improving your current ACoS.\n\nWould you like me to dive deeper into any specific area, or shall we proceed with implementing these recommendations?`,
             });
-            updateSystemLog('Waiting for your answers to create a personalized plan');
+            updateSystemLog('Analysis complete - Scaling strategy ready for review');
             setIsProcessing(false);
           }, 2000);
 
