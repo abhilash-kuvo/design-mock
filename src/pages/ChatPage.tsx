@@ -49,6 +49,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   // Save playbook state
   const [showSavePlaybook, setShowSavePlaybook] = useState(false);
   const [savePlaybookSuccess, setSavePlaybookSuccess] = useState(false);
+  const [showSavePlaybookCard, setShowSavePlaybookCard] = useState(false);
 
   // File attachment state
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
@@ -149,6 +150,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
             // Show save playbook option after analysis completes
             setTimeout(() => {
               setShowSavePlaybook(true);
+              setShowSavePlaybookCard(true);
             }, 1000);
           }, 2000);
 
@@ -382,7 +384,7 @@ Just type your feedback below and I'll refine the recommendations accordingly.`,
   };
 
   const handleDismissSavePlaybook = () => {
-    setShowSavePlaybook(false);
+    setShowSavePlaybookCard(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -485,6 +487,7 @@ Would you like me to dive deeper into any of these strategies or help you implem
         // Show save playbook option after analysis completes
         setTimeout(() => {
           setShowSavePlaybook(true);
+          setShowSavePlaybookCard(true);
         }, 1000);
         
         updateSystemLog('Ready for your next question');
@@ -825,7 +828,7 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
         <div className="px-6 pb-6">
           <div className="max-w-4xl mx-auto">
             {/* Save Playbook Suggestion Card - Above input area */}
-            {showSavePlaybook && !runningPlaybookId && (
+            {showSavePlaybookCard && !runningPlaybookId && (
               <div className="bg-gradient-to-r from-[#FFF5F2] to-[#FFE5DC] border border-[#FFE5DC] rounded-xl p-4 mb-4 animate-in slide-in-from-bottom duration-300">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
