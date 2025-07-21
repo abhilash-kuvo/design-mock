@@ -15,7 +15,7 @@ interface SystemLogEntry {
   timestamp: Date;
 }
 
-interface ChatPageProps {
+interface AmazonChatSimulationPageProps {
   initialQuery: string;
   runningPlaybookId?: string;
   onBack: () => void;
@@ -24,7 +24,7 @@ interface ChatPageProps {
   onNavigateToConnectedAccounts: () => void;
 }
 
-const ChatPage: React.FC<ChatPageProps> = ({ 
+const AmazonChatSimulationPage: React.FC<AmazonChatSimulationPageProps> = ({ 
   initialQuery, 
   runningPlaybookId,
   onBack, 
@@ -81,304 +81,125 @@ const ChatPage: React.FC<ChatPageProps> = ({
 
   useEffect(() => {
     if (initialQuery) {
-      // If running a playbook, show authentication flow first
+      // Clear existing messages first for playbook runs
       if (runningPlaybookId) {
-        // Clear existing messages first for playbook runs
         setMessages([]);
+      }
+
+      // NEW AMAZON ADS SIMULATION - Completely different behavior
+      if (runningPlaybookId === '2') {
+        const playbookTitle = getPlaybookTitle(runningPlaybookId);
         
-        if (runningPlaybookId === '1') {
-          // Google Ads Simulation
-          const playbookTitle = getPlaybookTitle(runningPlaybookId);
-          
+        addMessage({
+          type: 'assistant',
+          content: `🚀 Starting Advanced Amazon Ads Analysis: ${playbookTitle}`,
+        });
+
+        updateSystemLog('Connecting to Amazon Advertising API...');
+
+        const timeouts: NodeJS.Timeout[] = [];
+
+        // Step 1: API Connection
+        timeouts.push(setTimeout(() => {
           addMessage({
             type: 'assistant',
-            content: `Starting playbook execution: ${playbookTitle}`,
+            content: 'Step 1: Establishing secure connection to Amazon Advertising API',
+            isCollapsible: true,
+            details: [
+              'Authenticating with Amazon Seller Central',
+              'Retrieving campaign data from the last 90 days',
+              'Accessing product catalog and inventory levels',
+              'Collecting competitor intelligence data'
+            ]
           });
+          updateSystemLog('Analyzing campaign performance data...');
+        }, 1500));
 
-          updateSystemLog('Preparing playbook execution...');
+        // Step 2: Data Analysis
+        timeouts.push(setTimeout(() => {
+          addMessage({
+            type: 'assistant',
+            content: 'Step 2: Advanced performance analysis in progress',
+            isCollapsible: true,
+            details: [
+              'Processing 15,000+ search terms across 8 campaigns',
+              'Analyzing ACoS trends and seasonal patterns',
+              'Identifying top-performing ASINs and keywords',
+              'Calculating inventory velocity and profit margins'
+            ]
+          });
+          updateSystemLog('Generating scaling recommendations...');
+        }, 3000));
 
-          const timeouts: NodeJS.Timeout[] = [];
+        // Step 3: AI-Powered Insights
+        timeouts.push(setTimeout(() => {
+          addMessage({
+            type: 'assistant',
+            content: 'Step 3: AI-powered scaling opportunity detection',
+            isCollapsible: true,
+            details: [
+              'Machine learning analysis of 50+ performance metrics',
+              'Competitor gap analysis and market opportunity sizing',
+              'Predictive modeling for budget scaling scenarios',
+              'Risk assessment for aggressive scaling strategies'
+            ]
+          });
+          updateSystemLog('Finalizing recommendations and reports...');
+        }, 4500));
 
-          timeouts.push(setTimeout(() => {
-            addMessage({
-              type: 'auth',
-              content: 'This playbook requires access to your Google Ads account to analyze campaign data and implement recommendations.',
-              showAuthButtons: true,
-            });
-            updateSystemLog('Authentication required');
-            setIsProcessing(false);
-          }, 1500));
+        // Step 4: Results with Interactive Q&A
+        timeouts.push(setTimeout(() => {
+          addMessage({
+            type: 'assistant',
+            content: `🎯 **Amazon Ads Scaling Analysis Complete!**
 
-          return () => {
-            timeouts.forEach(timeout => clearTimeout(timeout));
-          };
-        }
-      } else {
-        // For regular queries (not running playbooks), show the analysis flow
-        const hasAssistantMessages = messages.some(msg => msg.type === 'assistant');
-        
-        if (!hasAssistantMessages) {
-          updateSystemLog('Analyzing your request...');
+I've identified **12 high-impact scaling opportunities** that could increase your sales by 40-60% while maintaining your target ACoS.
+
+**Key Findings:**
+• **$45,000** monthly revenue opportunity identified
+• **3 underperforming campaigns** ready for optimization  
+• **127 high-potential keywords** for expansion
+• **5 competitor gaps** you can exploit immediately
+
+**Priority Recommendations:**
+1. **Campaign Budget Reallocation** - Shift $8,000/month to top performers
+2. **Keyword Expansion** - Add 127 validated high-converting terms
+3. **Bid Strategy Optimization** - Implement dynamic bidding on 15 ASINs
+4. **New Campaign Launch** - Target 3 untapped product categories
+
+Before I provide your detailed action plan, I need to understand your specific goals and constraints.`,
+          });
           
-          const timeout = setTimeout(() => {
+          // Start interactive Q&A flow
+          setTimeout(() => {
             addMessage({
               type: 'assistant',
-              content: `✅ Analysis Complete! I've successfully analyzed your request and identified key opportunities.
+              content: `**Quick Strategy Questions** (2-3 minutes)
 
-Based on your query "${initialQuery}", I've prepared a comprehensive strategy that includes:
+To create your personalized scaling roadmap, please tell me:
 
-• Campaign structure optimization recommendations
-• High-potential keyword expansion opportunities  
-• Budget reallocation strategies for maximum ROI
-• Performance-based bidding adjustments
-• Optimization tactics for better performance
+**Question 1 of 3:** What's your primary goal for the next 90 days?
 
-Your personalized advertising plan is ready! This strategy is designed to help you improve performance while maintaining efficiency.
+A) **Maximize Revenue** - Grow sales volume even if ACoS increases slightly
+B) **Maintain Efficiency** - Scale while keeping current ACoS targets  
+C) **Market Expansion** - Enter new product categories or keywords
+D) **Competitive Defense** - Protect market share from competitors
 
-Would you like me to dive deeper into any specific area, or shall we proceed with implementing these recommendations?`,
-              downloadFiles: [
-                {
-                  id: 'strategy-report-1',
-                  name: 'Advertising Strategy Report.pdf',
-                  description: 'Comprehensive strategy with actionable recommendations',
-                  type: 'pdf'
-                },
-                {
-                  id: 'keyword-analysis-1',
-                  name: 'High-Potential Keywords Analysis.xlsx',
-                  description: 'Keyword expansion opportunities with search volume data',
-                  type: 'xlsx'
-                },
-                {
-                  id: 'budget-plan-1',
-                  name: 'Budget Reallocation Plan.csv',
-                  description: 'Campaign-level budget optimization recommendations',
-                  type: 'csv'
-                }
-              ]
+Please type A, B, C, or D, or describe your specific goals.`,
             });
-            updateSystemLog('Analysis complete - Strategy ready for review');
+            setQueryFlowStep(1);
+            setCurrentQueryContext(initialQuery);
+            updateSystemLog('Waiting for your strategic input...');
             setIsProcessing(false);
-            
-            // Show save playbook option after analysis completes
-            setTimeout(() => {
-              setShowSavePlaybook(true);
-              setShowSavePlaybookCard(true);
-            }, 1000);
-          }, 2000);
+          }, 1000);
+        }, 6000));
 
-          return () => clearTimeout(timeout);
-        }
+        return () => {
+          timeouts.forEach(timeout => clearTimeout(timeout));
+        };
       }
     }
   }, [initialQuery, runningPlaybookId, addMessage, setMessages]);
-
-  const handleGoogleAdsAuth = () => {
-    // Hide the auth panel by marking auth as completed
-    setAuthCompleted(true);
-    
-    // Authentication flow implementation
-    addMessage({
-      type: 'assistant',
-      content: `Google Ads authentication successful!
-
-Connected Account Details:
-• Account: Digital Marketing Pro (ID: 123-456-7890)
-• Email: marketing@yourcompany.com
-
-Starting data analysis...`,
-    });
-    updateSystemLog('Analyzing your Google Ads data...');
-    setIsProcessing(true);
-
-    const timeouts: NodeJS.Timeout[] = [];
-
-    // Step 1: Data Collection
-    timeouts.push(setTimeout(() => {
-      addMessage({
-        type: 'assistant',
-        content: 'Step 1: Collecting campaign data from Google Ads',
-        isCollapsible: true,
-        details: [
-          'Campaigns Found: 12 active campaigns',
-          'Retrieving campaign performance data for the last 30 days',
-          'Collecting search terms, keywords, and match types',
-          'Gathering cost, click, and conversion metrics'
-        ]
-      });
-      updateSystemLog('Collecting campaign data...');
-    }, 1500));
-
-    // Step 2: Analysis
-    timeouts.push(setTimeout(() => {
-      addMessage({
-        type: 'assistant',
-        content: 'Step 2: Analyzing campaign data for patterns',
-        isCollapsible: true,
-        details: [
-          'Processing 2,847 search terms from 12 campaigns',
-          'Identifying high-cost, low-converting search queries',
-          'Analyzing search term relevance to your products',
-          'Calculating potential cost savings for each negative keyword'
-        ]
-      });
-      updateSystemLog('Analyzing performance patterns...');
-    }, 3000));
-
-    // Step 3: Identification
-    timeouts.push(setTimeout(() => {
-      addMessage({
-        type: 'assistant',
-        content: 'Step 3: Identifying negative keyword opportunities',
-        isCollapsible: true,
-        details: [
-          'Found 47 potential negative keywords',
-          'Prioritizing by cost impact and relevance',
-          'Categorizing by match type recommendations',
-          'Validating against your product catalog'
-        ]
-      });
-      updateSystemLog('Identifying optimization opportunities...');
-    }, 4500));
-
-    // Step 4: Recommendations
-    timeouts.push(setTimeout(() => {
-      addMessage({
-        type: 'assistant',
-        content: 'Step 4: Generating actionable recommendations',
-        isCollapsible: true,
-        details: [
-          'Creating prioritized negative keyword list',
-          'Estimating monthly cost savings: $2,340',
-          'Preparing implementation instructions',
-          'Generating performance impact projections'
-        ]
-      });
-      updateSystemLog('Generating recommendations...');
-    }, 6000));
-
-    // Step 5: Results with CSV data
-    timeouts.push(setTimeout(() => {
-      const csvContent = `Search Term,Match Type,Impressions,Clicks,Cost,Conversions,Recommendation
-free,Broad,1250,45,$450.00,0,Add as negative keyword - High Priority
-cheap,Phrase,890,32,$280.00,1,Add as negative keyword - High Priority
-tutorial,Exact,670,28,$220.00,0,Add as negative keyword - High Priority
-download,Broad,540,19,$180.00,0,Add as negative keyword - High Priority
-review,Phrase,420,15,$120.00,2,Consider for broad match negative only
-comparison,Broad,380,12,$95.00,1,Monitor - may keep for awareness
-vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy
-how to,Broad,250,10,$65.00,0,Add as negative keyword - High Priority
-best,Phrase,220,9,$58.00,1,Monitor - evaluate based on strategy
-top,Broad,200,7,$45.00,0,Add as negative keyword - High Priority
-guide,Exact,180,6,$42.00,0,Add as negative keyword - High Priority
-tips,Phrase,160,5,$38.00,1,Consider for broad match negative only
-help,Broad,140,4,$32.00,0,Add as negative keyword - High Priority
-support,Phrase,120,3,$28.00,0,Add as negative keyword - High Priority
-service,Broad,100,2,$22.00,1,Monitor - evaluate based on strategy`;
-
-      addMessage({
-        type: 'assistant',
-        content: `🎯 Analysis Complete! I found 47 potential negative keywords that could save you approximately $2,340 per month.
-
-Key Findings:
-• Total search terms analyzed: 2,847
-• Campaigns reviewed: 12
-• Potential monthly savings: $2,340
-• Estimated CTR improvement: +0.8%`,
-        csvContentData: csvContent,
-        showApprovalButtons: true
-      });
-      updateSystemLog('Analysis complete - Ready for next steps');
-      setIsProcessing(false);
-    }, 7500));
-
-    return () => {
-      timeouts.forEach(timeout => clearTimeout(timeout));
-    };
-  };
-
-  const handleManualUpload = () => {
-    // Hide the auth panel by marking auth as completed
-    setAuthCompleted(true);
-    
-    // Manual upload flow
-    setTimeout(() => {
-      addMessage({
-        type: 'assistant',
-        content: `Perfect! Please upload your Google Ads search terms report.
-
-How to get this data from Google Ads:
-1. Go to Keywords → Search terms
-2. Select your date range (recommend last 30-90 days)
-3. Click Download → CSV or xlsx or xls format is fine
-
-Once you upload the file, I'll analyze it and provide negative keyword recommendations.`,
-      });
-      updateSystemLog('Ready to analyze your uploaded data');
-      setIsProcessing(false);
-    }, 1500);
-  };
-
-  const handleApproveRecommendations = () => {
-    // Hide approval buttons by updating the message
-    setMessages(prev => prev.map(msg => 
-      msg.showApprovalButtons ? { ...msg, showApprovalButtons: false } : msg
-    ));
-
-    addMessage({
-      type: 'user',
-      content: 'Approve Recommendations',
-    });
-
-    setTimeout(() => {
-      addMessage({
-        type: 'assistant',
-        content: `✅ Recommendations approved! 
-
-I'll now implement these negative keywords in your Google Ads account:
-
-• Adding 15 high-priority negative keywords
-• Applying broad match negatives to all campaigns
-• Setting up phrase match negatives for specific ad groups
-• Creating monitoring alerts for the "monitor" keywords
-
-Implementation will be completed within the next 15 minutes. You'll receive an email confirmation once all changes are live.
-
-Expected impact:
-• Reduced wasted spend: ~$2,340/month
-• Improved CTR: +0.8%
-• Better conversion rates: +12%`,
-      });
-      updateSystemLog('Implementation in progress');
-    }, 1500);
-  };
-
-  const handleProvideFeedback = () => {
-    // Hide approval buttons by updating the message
-    setMessages(prev => prev.map(msg => 
-      msg.showApprovalButtons ? { ...msg, showApprovalButtons: false } : msg
-    ));
-
-    addMessage({
-      type: 'user',
-      content: 'Provide Feedback',
-    });
-
-    setTimeout(() => {
-      addMessage({
-        type: 'assistant',
-        content: `I'd love to hear your feedback on these recommendations! Please let me know:
-
-• Are there any keywords you'd like to keep that I recommended as negatives?
-• Do you see any important negative keywords missing from the list?
-• Would you like me to adjust the priority levels for any recommendations?
-• Are there specific campaigns or ad groups where you'd like different treatment?
-
-Just type your feedback below and I'll refine the recommendations accordingly.`,
-      });
-      updateSystemLog('Waiting for your feedback');
-    }, 1500);
-  };
 
   const handleSavePlaybook = () => {
     // In a real app, this would save the current query and flow as a reusable playbook
@@ -436,7 +257,7 @@ Just type your feedback below and I'll refine the recommendations accordingly.`,
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
 
-    // Handle Q&A flow responses
+    // Handle Q&A flow responses for Amazon simulation
     if (queryFlowStep === 1) {
       addMessage({
         type: 'user',
@@ -445,51 +266,131 @@ Just type your feedback below and I'll refine the recommendations accordingly.`,
 
       const userResponse = newMessage;
       setNewMessage('');
-      updateSystemLog('Analyzing your responses and creating a personalized plan...');
+      updateSystemLog('Processing your goals and creating personalized strategy...');
       setIsProcessing(true);
 
       // Store the user's answers
       setUserAnswers([userResponse]);
 
       setTimeout(() => {
+        // Generate response based on user's choice
+        let responseContent = '';
+        const choice = userResponse.toUpperCase().trim();
+        
+        if (choice === 'A' || userResponse.toLowerCase().includes('maximize revenue')) {
+          responseContent = `**Perfect! Revenue Maximization Strategy Selected** 🚀
+
+Based on your goal to maximize revenue, here's your aggressive scaling plan:
+
+**90-Day Revenue Growth Roadmap:**
+
+**Month 1: Foundation ($15K additional revenue)**
+• Increase budgets by 40% on top 3 performing campaigns
+• Launch 47 new high-volume keywords with aggressive bids
+• Expand to 2 new product variations
+
+**Month 2: Acceleration ($25K additional revenue)**  
+• Scale successful keywords from Month 1
+• Launch competitor conquest campaigns
+• Implement dynamic bidding on all top ASINs
+
+**Month 3: Optimization ($35K additional revenue)**
+• Fine-tune based on performance data
+• Launch seasonal/trending keyword campaigns
+• Expand to related product categories
+
+**Expected Results:**
+• **Total Revenue Increase:** $75,000 over 90 days
+• **ACoS Impact:** May increase by 15-20% initially, then stabilize
+• **ROI Timeline:** Break-even by day 45, profitable by day 60`;
+        } else if (choice === 'B' || userResponse.toLowerCase().includes('maintain efficiency')) {
+          responseContent = `**Excellent! Efficiency-First Scaling Strategy Selected** ⚖️
+
+Based on your goal to maintain ACoS while scaling, here's your balanced approach:
+
+**90-Day Efficient Growth Roadmap:**
+
+**Month 1: Smart Expansion ($8K additional revenue)**
+• Increase budgets by 20% only on campaigns with ACoS < target
+• Add 25 carefully selected high-converting keywords
+• Optimize existing campaigns for better Quality Scores
+
+**Month 2: Strategic Growth ($15K additional revenue)**
+• Scale proven winners from Month 1
+• Launch exact match campaigns for top search terms
+• Implement dayparting for optimal bid timing
+
+**Month 3: Compound Growth ($22K additional revenue)**
+• Expand successful strategies across all campaigns
+• Launch brand defense campaigns
+• Test new ad formats (video, sponsored display)
+
+**Expected Results:**
+• **Total Revenue Increase:** $45,000 over 90 days
+• **ACoS Impact:** Maintain current levels or improve by 5-10%
+• **ROI Timeline:** Profitable from day 1`;
+        } else {
+          responseContent = `**Great Choice! Custom Strategy Development** 🎯
+
+Based on your specific goals: "${userResponse}"
+
+I'm creating a tailored approach that combines:
+• Revenue growth opportunities aligned with your objectives
+• Risk management to protect your current performance
+• Scalable tactics that fit your business model
+
+**Your Custom 90-Day Roadmap:**
+
+**Phase 1: Strategic Foundation**
+• Analyze your specific requirements in detail
+• Identify the highest-impact, lowest-risk opportunities
+• Create a testing framework for your unique situation
+
+**Phase 2: Controlled Expansion**  
+• Implement proven tactics from similar businesses
+• Scale based on real performance data
+• Adjust strategy based on market response
+
+**Phase 3: Accelerated Growth**
+• Double down on successful initiatives
+• Expand to new opportunities
+• Optimize for long-term sustainability
+
+**Expected Results:**
+• **Customized revenue targets** based on your goals
+• **Risk-adjusted growth** that fits your comfort level
+• **Flexible timeline** that adapts to your business needs`;
+        }
+
         addMessage({
           type: 'assistant',
-          content: `Perfect! Based on your responses and the original query "${currentQueryContext}", here's your personalized Amazon ads scaling plan:
-
-Scaling Strategy Analysis
-
-Your Input: ${userResponse}
-
-Priority Opportunities
-
-1. Campaign Structure Optimization
-• Analyze your top-performing ASINs for scaling potential
-• Implement campaign segmentation by performance tiers
-• Set up dedicated campaigns for your best sellers
-
-2. Keyword Expansion Strategy
-• Identify high-converting search terms from auto campaigns
-• Research competitor keywords in your top categories
-• Implement broad-to-exact keyword harvesting
-
-3. Budget Reallocation Plan
-• Shift budget from underperforming campaigns
-• Increase bids on profitable keywords during peak hours
-• Test higher budgets on campaigns with impression share loss
-
-Next Steps
-
-1. Week 1: Audit current campaign structure and performance
-2. Week 2: Implement keyword expansion and budget optimization
-3. Week 3: Launch new campaigns for top opportunities
-4. Week 4: Monitor and optimize based on performance data
-
-Expected Results
-• 20-40% increase in sales volume
-• 10-15% improvement in overall ACoS
-• Better inventory velocity for top products
-
-Would you like me to dive deeper into any of these strategies or help you implement specific recommendations?`,
+          content: responseContent,
+          downloadFiles: [
+            {
+              id: 'custom-strategy-1',
+              name: 'Amazon Scaling Strategy - 90 Day Plan.pdf',
+              description: 'Your personalized scaling roadmap with week-by-week action items',
+              type: 'pdf'
+            },
+            {
+              id: 'keyword-expansion-1',
+              name: 'High-Opportunity Keywords List.xlsx',
+              description: '127 validated keywords with search volume and competition data',
+              type: 'xlsx'
+            },
+            {
+              id: 'budget-allocation-1',
+              name: 'Campaign Budget Optimization Plan.csv',
+              description: 'Detailed budget reallocation recommendations by campaign',
+              type: 'csv'
+            },
+            {
+              id: 'competitor-analysis-1',
+              name: 'Competitor Gap Analysis Report.pdf',
+              description: 'Market opportunities and competitive positioning insights',
+              type: 'pdf'
+            }
+          ]
         });
         
         // Reset Q&A flow
@@ -503,7 +404,7 @@ Would you like me to dive deeper into any of these strategies or help you implem
           setShowSavePlaybookCard(true);
         }, 1000);
         
-        updateSystemLog('Ready for your next question');
+        updateSystemLog('Strategy complete - Ready for implementation');
         setIsProcessing(false);
       }, 3000);
 
@@ -567,20 +468,17 @@ Would you like me to dive deeper into any of these strategies or help you implem
     let mimeType = 'text/plain';
     
     if (fileName.includes('.csv')) {
-      content = `Search Term,Match Type,Impressions,Clicks,Cost,Conversions,Recommendation
-free,Broad,1250,45,$450.00,0,Add as negative keyword - High Priority
-cheap,Phrase,890,32,$280.00,1,Add as negative keyword - High Priority
-tutorial,Exact,670,28,$220.00,0,Add as negative keyword - High Priority
-download,Broad,540,19,$180.00,0,Add as negative keyword - High Priority
-review,Phrase,420,15,$120.00,2,Consider for broad match negative only
-comparison,Broad,380,12,$95.00,1,Monitor - may keep for awareness
-vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
+      content = `Campaign,Current Budget,Recommended Budget,Expected Revenue Increase,Risk Level
+Campaign A,$2000,$2800,$5600,Low
+Campaign B,$1500,$2100,$4200,Low
+Campaign C,$3000,$3600,$7200,Medium
+Campaign D,$800,$1200,$2400,Low`;
       mimeType = 'text/csv';
     } else if (fileName.includes('.xlsx')) {
-      content = 'Keyword,Search Volume,Competition,CPC,Opportunity Score\namazon best seller,45000,High,$2.50,85\nproduct reviews,32000,Medium,$1.80,78\ntop rated,28000,Low,$1.20,92';
+      content = 'Keyword,Search Volume,Competition,CPC,Opportunity Score,Recommended Action\namazon best seller,45000,High,$2.50,85,Add as Exact Match\nproduct reviews,32000,Medium,$1.80,78,Add as Phrase Match\ntop rated,28000,Low,$1.20,92,Add as Broad Match';
       mimeType = 'text/csv'; // For demo purposes, we'll use CSV format
     } else if (fileName.includes('.pdf')) {
-      content = 'Amazon Ads Scaling Strategy Report\n\nExecutive Summary:\nThis report contains comprehensive scaling recommendations for your Amazon advertising campaigns...\n\n1. Campaign Structure Optimization\n2. Keyword Expansion Strategy\n3. Budget Reallocation Plan';
+      content = 'Amazon Ads Scaling Strategy - 90 Day Plan\n\nExecutive Summary:\nThis comprehensive scaling strategy is designed to increase your Amazon advertising revenue by $45,000 over the next 90 days while maintaining efficiency.\n\nWeek 1-2: Foundation Setup\n• Campaign audit and optimization\n• Keyword research and expansion\n• Budget reallocation\n\nWeek 3-4: Implementation\n• Launch new campaigns\n• Implement bidding strategies\n• Monitor performance metrics';
       mimeType = 'text/plain';
     } else {
       content = `Content for ${fileName}`;
@@ -598,6 +496,9 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
   };
 
   const getPlaceholderText = () => {
+    if (queryFlowStep === 1) {
+      return "Type A, B, C, D or describe your specific goals...";
+    }
     return "Type your message...";
   };
 
@@ -660,84 +561,27 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                 </div>
                 <div>
                   <h4 className="text-sm font-medium text-green-900">Playbook Saved Successfully!</h4>
-                  <p className="text-sm text-green-700">You can now find this analysis in "My Agents" and reuse it anytime.</p>
+                  <p className="text-sm text-green-700">You can now find this analysis in "My Playbooks" and reuse it anytime.</p>
                 </div>
               </div>
             )}
 
             {messages.map((message, index) => {
-              // Skip rendering auth messages if auth is completed
-              if (message.type === 'auth' && authCompleted) {
-                return null;
-              }
-
               return (
                 <div
                   key={message.id}
                   className={`flex ${
-                    message.type === 'user' ? 'justify-end' : 
-                    message.type === 'auth' ? 'justify-center' : 'justify-start'
+                    message.type === 'user' ? 'justify-end' : 'justify-start'
                   } mb-6`}
                 >
                   <div className={`${
                     message.type === 'user' 
                       ? 'max-w-[80%] bg-gray-100 text-gray-800 rounded-2xl p-4 border border-gray-200' 
-                      : message.type === 'auth'
-                      ? 'bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 w-full max-w-md'
                       : message.isCollapsible 
                       ? 'bg-[#FFF5F2] border border-[#FFE5DC] rounded-2xl overflow-hidden w-full max-w-[80%]'
-                      : message.csvContentData
-                      ? 'w-full max-w-[90%]'
                       : 'max-w-[80%] bg-white text-gray-800 shadow-sm rounded-2xl p-4'
                   }`}>
-                    {message.type === 'auth' ? (
-                      <>
-                        <div className="text-center">
-                          <div className="flex justify-center mb-4">
-                            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                              <Shield size={24} className="text-blue-600" />
-                            </div>
-                          </div>
-                          <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                            Google Ads Authentication Required
-                          </h3>
-                          <p className="text-sm text-gray-600 mb-6">
-                            {message.content}
-                          </p>
-                          
-                          {message.showAuthButtons && (
-                            <div className="space-y-3">
-                              <button
-                                onClick={handleGoogleAdsAuth}
-                                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                              >
-                                <img 
-                                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
-                                  alt="Google" 
-                                  className="w-5 h-5"
-                                />
-                                <span>Connect Google Ads Account</span>
-                                <ExternalLink size={16} />
-                              </button>
-                              
-                              <div className="flex items-center my-4">
-                                <div className="flex-grow h-px bg-gray-200"></div>
-                                <span className="px-4 text-sm text-gray-500">OR</span>
-                                <div className="flex-grow h-px bg-gray-200"></div>
-                              </div>
-                              
-                              <button
-                                onClick={handleManualUpload}
-                                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors border border-gray-300"
-                              >
-                                <Upload size={16} />
-                                <span>Upload Search Terms Data Manually</span>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </>
-                    ) : message.isCollapsible ? (
+                    {message.isCollapsible ? (
                       <>
                         <button
                           onClick={() => toggleMessageDetails(message.id)}
@@ -769,33 +613,11 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                           </div>
                         )}
                       </>
-                    ) : message.csvContentData ? (
-                      <div className="bg-white text-gray-800 shadow-sm rounded-2xl p-4">
-                        <div className="whitespace-pre-wrap text-sm font-medium text-black mb-4">
-                          {message.content}
-                        </div>
-                        <CsvDataTable 
-                          csvString={message.csvContentData} 
-                          fileName="negative-keywords-recommendations.csv"
-                          onApprove={handleApproveRecommendations}
-                          onFeedback={handleProvideFeedback}
-                          showActions={message.showApprovalButtons}
-                        />
-                      </div>
                     ) : (
                       <div>
                         <div className="whitespace-pre-wrap text-sm font-medium text-black">
                           {message.content}
                         </div>
-                        {message.hasDownload && message.downloadFileName && (
-                          <div className="mt-4 pt-4 border-t border-gray-200">
-                            <FileChip
-                              fileName={message.downloadFileName}
-                              onClick={() => handleDownload(message.downloadFileName!)}
-                              type="download"
-                            />
-                          </div>
-                        )}
                         {/* Render attached files for user messages */}
                         {message.type === 'user' && message.attachedFiles && (
                           renderAttachedFiles(message.attachedFiles)
@@ -962,4 +784,4 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
   );
 };
 
-export default ChatPage;
+export default AmazonChatSimulationPage;

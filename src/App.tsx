@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ChatProvider } from './contexts/ChatContext';
 import BuildPage from './pages/BuildPage';
 import ChatPage from './pages/ChatPage';
+import AmazonChatSimulationPage from './pages/AmazonChatSimulationPage';
 import MyPlaybooksPage from './pages/MyPlaybooksPage';
 import PlaybookDetailsPage from './pages/PlaybookDetailsPage';
 import LibraryPage from './pages/LibraryPage';
@@ -160,6 +161,21 @@ const AppContent: React.FC = () => {
   }
 
   if (currentView === 'chat') {
+    // Use Amazon-specific simulation for Amazon Ads playbook
+    if (runningPlaybookId === '2') {
+      return (
+        <AmazonChatSimulationPage 
+          initialQuery={currentQuery} 
+          runningPlaybookId={runningPlaybookId}
+          onBack={handleBackFromChat}
+          onNewPlaybook={handleNewPlaybook}
+          onMyPlaybooks={handleMyPlaybooks}
+          onNavigateToConnectedAccounts={handleNavigateToConnectedAccounts}
+        />
+      );
+    }
+    
+    // Use regular ChatPage for all other cases
     return (
       <ChatPage 
         initialQuery={currentQuery} 
