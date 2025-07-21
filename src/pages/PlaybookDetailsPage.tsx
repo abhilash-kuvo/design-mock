@@ -295,7 +295,7 @@ const PlaybookDetailsPage: React.FC<PlaybookDetailsPageProps> = ({
   const getPlaceholderText = () => {
     const baseText = selectedNode 
       ? `Describe changes for Step ${selectedNode.data.stepNumber}...`
-      : "Describe the changes you want to make to the entire agent...";
+      : "Describe the changes you want to make to the entire playbook...";
     
     const examples = `
 
