@@ -97,106 +97,31 @@ const AmazonChatSimulationPage: React.FC<AmazonChatSimulationPageProps> = ({
 
         updateSystemLog('Connecting to Amazon Advertising API...');
 
-        const timeouts: NodeJS.Timeout[] = [];
-
-        // Step 1: API Connection
-        timeouts.push(setTimeout(() => {
+        // Simple file upload request
+        setTimeout(() => {
           addMessage({
             type: 'assistant',
-            content: 'Step 1: Establishing secure connection to Amazon Advertising API',
-            isCollapsible: true,
-            details: [
-              'Authenticating with Amazon Seller Central',
-              'Retrieving campaign data from the last 90 days',
-              'Accessing product catalog and inventory levels',
-              'Collecting competitor intelligence data'
-            ]
+            content: `To provide you with accurate scaling recommendations, I need you to upload the following 3 files from your Amazon Ads account:
+
+**Required Files:**
+
+1. **Campaign_Performance_Report.csv**
+   - Download from: Amazon Ads Console → Reports → Campaign Performance
+   - Date range: Last 60 days
+
+2. **Product_Catalog_Feed.xlsx** 
+   - Download from: Seller Central → Inventory → Manage Inventory
+   - Include: ASIN, Title, Price, Stock levels
+
+3. **Competitor_Analysis_Data.pdf**
+   - Download from: Amazon Ads Console → Insights → Competitor Intelligence
+   - Include: Top competing ASINs and their ad spend
+
+Please upload these files using the attachment button below, and I'll analyze them to provide your personalized scaling strategy.`,
           });
-          updateSystemLog('Analyzing campaign performance data...');
-        }, 1500));
-
-        // Step 2: Data Analysis
-        timeouts.push(setTimeout(() => {
-          addMessage({
-            type: 'assistant',
-            content: 'Step 2: Advanced performance analysis in progress',
-            isCollapsible: true,
-            details: [
-              'Processing 15,000+ search terms across 8 campaigns',
-              'Analyzing ACoS trends and seasonal patterns',
-              'Identifying top-performing ASINs and keywords',
-              'Calculating inventory velocity and profit margins'
-            ]
-          });
-          updateSystemLog('Generating scaling recommendations...');
-        }, 3000));
-
-        // Step 3: AI-Powered Insights
-        timeouts.push(setTimeout(() => {
-          addMessage({
-            type: 'assistant',
-            content: 'Step 3: AI-powered scaling opportunity detection',
-            isCollapsible: true,
-            details: [
-              'Machine learning analysis of 50+ performance metrics',
-              'Competitor gap analysis and market opportunity sizing',
-              'Predictive modeling for budget scaling scenarios',
-              'Risk assessment for aggressive scaling strategies'
-            ]
-          });
-          updateSystemLog('Finalizing recommendations and reports...');
-        }, 4500));
-
-        // Step 4: Results with Interactive Q&A
-        timeouts.push(setTimeout(() => {
-          addMessage({
-            type: 'assistant',
-            content: `🎯 **Amazon Ads Scaling Analysis Complete!**
-
-I've identified **12 high-impact scaling opportunities** that could increase your sales by 40-60% while maintaining your target ACoS.
-
-**Key Findings:**
-• **$45,000** monthly revenue opportunity identified
-• **3 underperforming campaigns** ready for optimization  
-• **127 high-potential keywords** for expansion
-• **5 competitor gaps** you can exploit immediately
-
-**Priority Recommendations:**
-1. **Campaign Budget Reallocation** - Shift $8,000/month to top performers
-2. **Keyword Expansion** - Add 127 validated high-converting terms
-3. **Bid Strategy Optimization** - Implement dynamic bidding on 15 ASINs
-4. **New Campaign Launch** - Target 3 untapped product categories
-
-Before I provide your detailed action plan, I need to understand your specific goals and constraints.`,
-          });
-          
-          // Start interactive Q&A flow
-          setTimeout(() => {
-            addMessage({
-              type: 'assistant',
-              content: `**Quick Strategy Questions** (2-3 minutes)
-
-To create your personalized scaling roadmap, please tell me:
-
-**Question 1 of 3:** What's your primary goal for the next 90 days?
-
-A) **Maximize Revenue** - Grow sales volume even if ACoS increases slightly
-B) **Maintain Efficiency** - Scale while keeping current ACoS targets  
-C) **Market Expansion** - Enter new product categories or keywords
-D) **Competitive Defense** - Protect market share from competitors
-
-Please type A, B, C, or D, or describe your specific goals.`,
-            });
-            setQueryFlowStep(1);
-            setCurrentQueryContext(initialQuery);
-            updateSystemLog('Waiting for your strategic input...');
-            setIsProcessing(false);
-          }, 1000);
-        }, 6000));
-
-        return () => {
-          timeouts.forEach(timeout => clearTimeout(timeout));
-        };
+          updateSystemLog('Waiting for file uploads...');
+          setIsProcessing(false);
+        }, 2000);
       }
     }
   }, [initialQuery, runningPlaybookId, addMessage, setMessages]);
@@ -257,160 +182,6 @@ Please type A, B, C, or D, or describe your specific goals.`,
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
 
-    // Handle Q&A flow responses for Amazon simulation
-    if (queryFlowStep === 1) {
-      addMessage({
-        type: 'user',
-        content: newMessage,
-      });
-
-      const userResponse = newMessage;
-      setNewMessage('');
-      updateSystemLog('Processing your goals and creating personalized strategy...');
-      setIsProcessing(true);
-
-      // Store the user's answers
-      setUserAnswers([userResponse]);
-
-      setTimeout(() => {
-        // Generate response based on user's choice
-        let responseContent = '';
-        const choice = userResponse.toUpperCase().trim();
-        
-        if (choice === 'A' || userResponse.toLowerCase().includes('maximize revenue')) {
-          responseContent = `**Perfect! Revenue Maximization Strategy Selected** 🚀
-
-Based on your goal to maximize revenue, here's your aggressive scaling plan:
-
-**90-Day Revenue Growth Roadmap:**
-
-**Month 1: Foundation ($15K additional revenue)**
-• Increase budgets by 40% on top 3 performing campaigns
-• Launch 47 new high-volume keywords with aggressive bids
-• Expand to 2 new product variations
-
-**Month 2: Acceleration ($25K additional revenue)**  
-• Scale successful keywords from Month 1
-• Launch competitor conquest campaigns
-• Implement dynamic bidding on all top ASINs
-
-**Month 3: Optimization ($35K additional revenue)**
-• Fine-tune based on performance data
-• Launch seasonal/trending keyword campaigns
-• Expand to related product categories
-
-**Expected Results:**
-• **Total Revenue Increase:** $75,000 over 90 days
-• **ACoS Impact:** May increase by 15-20% initially, then stabilize
-• **ROI Timeline:** Break-even by day 45, profitable by day 60`;
-        } else if (choice === 'B' || userResponse.toLowerCase().includes('maintain efficiency')) {
-          responseContent = `**Excellent! Efficiency-First Scaling Strategy Selected** ⚖️
-
-Based on your goal to maintain ACoS while scaling, here's your balanced approach:
-
-**90-Day Efficient Growth Roadmap:**
-
-**Month 1: Smart Expansion ($8K additional revenue)**
-• Increase budgets by 20% only on campaigns with ACoS < target
-• Add 25 carefully selected high-converting keywords
-• Optimize existing campaigns for better Quality Scores
-
-**Month 2: Strategic Growth ($15K additional revenue)**
-• Scale proven winners from Month 1
-• Launch exact match campaigns for top search terms
-• Implement dayparting for optimal bid timing
-
-**Month 3: Compound Growth ($22K additional revenue)**
-• Expand successful strategies across all campaigns
-• Launch brand defense campaigns
-• Test new ad formats (video, sponsored display)
-
-**Expected Results:**
-• **Total Revenue Increase:** $45,000 over 90 days
-• **ACoS Impact:** Maintain current levels or improve by 5-10%
-• **ROI Timeline:** Profitable from day 1`;
-        } else {
-          responseContent = `**Great Choice! Custom Strategy Development** 🎯
-
-Based on your specific goals: "${userResponse}"
-
-I'm creating a tailored approach that combines:
-• Revenue growth opportunities aligned with your objectives
-• Risk management to protect your current performance
-• Scalable tactics that fit your business model
-
-**Your Custom 90-Day Roadmap:**
-
-**Phase 1: Strategic Foundation**
-• Analyze your specific requirements in detail
-• Identify the highest-impact, lowest-risk opportunities
-• Create a testing framework for your unique situation
-
-**Phase 2: Controlled Expansion**  
-• Implement proven tactics from similar businesses
-• Scale based on real performance data
-• Adjust strategy based on market response
-
-**Phase 3: Accelerated Growth**
-• Double down on successful initiatives
-• Expand to new opportunities
-• Optimize for long-term sustainability
-
-**Expected Results:**
-• **Customized revenue targets** based on your goals
-• **Risk-adjusted growth** that fits your comfort level
-• **Flexible timeline** that adapts to your business needs`;
-        }
-
-        addMessage({
-          type: 'assistant',
-          content: responseContent,
-          downloadFiles: [
-            {
-              id: 'custom-strategy-1',
-              name: 'Amazon Scaling Strategy - 90 Day Plan.pdf',
-              description: 'Your personalized scaling roadmap with week-by-week action items',
-              type: 'pdf'
-            },
-            {
-              id: 'keyword-expansion-1',
-              name: 'High-Opportunity Keywords List.xlsx',
-              description: '127 validated keywords with search volume and competition data',
-              type: 'xlsx'
-            },
-            {
-              id: 'budget-allocation-1',
-              name: 'Campaign Budget Optimization Plan.csv',
-              description: 'Detailed budget reallocation recommendations by campaign',
-              type: 'csv'
-            },
-            {
-              id: 'competitor-analysis-1',
-              name: 'Competitor Gap Analysis Report.pdf',
-              description: 'Market opportunities and competitive positioning insights',
-              type: 'pdf'
-            }
-          ]
-        });
-        
-        // Reset Q&A flow
-        setQueryFlowStep(0);
-        setCurrentQueryContext('');
-        setUserAnswers([]);
-        
-        // Show save playbook option after analysis completes
-        setTimeout(() => {
-          setShowSavePlaybook(true);
-          setShowSavePlaybookCard(true);
-        }, 1000);
-        
-        updateSystemLog('Strategy complete - Ready for implementation');
-        setIsProcessing(false);
-      }, 3000);
-
-      return;
-    }
-
     // Regular message handling for non-Q&A flow
     addUserMessage(newMessage, attachedFiles.length > 0 ? attachedFiles : undefined);
     
@@ -424,9 +195,9 @@ I'm creating a tailored approach that combines:
     setTimeout(() => {
       addMessage({
         type: 'assistant',
-        content: 'Here is a simulated response to your message.',
+        content: 'Thank you for your message. Once you upload the required files, I\'ll begin processing your Amazon Ads data to provide scaling recommendations.',
       });
-      updateSystemLog('Ready for your next question');
+      updateSystemLog('Still waiting for file uploads...');
       setIsProcessing(false);
     }, 2000);
   };
