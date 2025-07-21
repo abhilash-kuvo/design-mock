@@ -610,15 +610,6 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
           </div>
           <div className="flex items-center space-x-3">
             {/* Save Playbook Button - Only show for regular queries (not running playbooks) */}
-            {!runningPlaybookId && showSavePlaybook && (
-              <button
-                onClick={handleSavePlaybook}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-              >
-                <span>💾</span>
-                <span>Save as Playbook</span>
-              </button>
-            )}
             
             <button 
               onClick={onNavigateToConnectedAccounts}
@@ -846,7 +837,7 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                     </button>
                     <button
                       onClick={handleSavePlaybook}
-                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                     className="flex items-center space-x-2 px-4 py-2 bg-[#FF7F50] text-white rounded-lg hover:bg-[#E67348] transition-colors text-sm font-medium"
                     >
                       <span>💾</span>
                       <span>Save Playbook</span>
