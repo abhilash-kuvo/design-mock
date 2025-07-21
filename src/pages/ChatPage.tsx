@@ -83,12 +83,13 @@ const ChatPage: React.FC<ChatPageProps> = ({
     if (initialQuery) {
       // If running a playbook, show authentication flow first
       if (runningPlaybookId) {
+        // Clear existing messages first for playbook runs
+        setMessages([]);
+        
         if (runningPlaybookId === '1') {
           // Google Ads Simulation
           const playbookTitle = getPlaybookTitle(runningPlaybookId);
           
-          // Clear existing messages and add the playbook start message
-          setMessages([]);
           addMessage({
             type: 'assistant',
             content: `Starting playbook execution: ${playbookTitle}`,
@@ -115,8 +116,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
           // Amazon Ads Simulation
           const playbookTitle = getPlaybookTitle(runningPlaybookId);
           
-          // Clear existing messages and add the playbook start message
-          setMessages([]);
           addMessage({
             type: 'assistant',
             content: `Starting playbook execution: ${playbookTitle}`,
