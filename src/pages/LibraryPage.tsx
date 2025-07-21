@@ -280,7 +280,7 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
             {/* No Results */}
             {sortedPlaybooks.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">No agents found matching your criteria.</p>
+                <p className="text-gray-500 text-lg">No playbooks found matching your criteria.</p>
                 <p className="text-gray-400 text-sm mt-2">Try adjusting your search or filters.</p>
               </div>
             )}

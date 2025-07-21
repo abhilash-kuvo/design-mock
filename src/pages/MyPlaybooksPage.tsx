@@ -430,7 +430,7 @@ const MyPlaybooksPage: React.FC<MyPlaybooksPageProps> = ({
             {/* Pagination Info */}
             {filteredPlaybooks.length > 0 && (
               <div className="mt-4 text-center text-sm text-gray-500">
-                Showing {indexOfFirstPlaybook + 1}-{Math.min(indexOfLastPlaybook, filteredPlaybooks.length)} of {filteredPlaybooks.length} agents
+                Showing {indexOfFirstPlaybook + 1}-{Math.min(indexOfLastPlaybook, filteredPlaybooks.length)} of {filteredPlaybooks.length} playbooks
               </div>
             )}
           </div>
