@@ -196,9 +196,7 @@ Would you like me to dive deeper into any specific area, or shall we proceed wit
         }
       } else {
         // For regular queries (not running playbooks), show the analysis flow
-        const hasAssistantMessages = messages.some(msg => msg.type === 'assistant');
-        
-        if (!hasAssistantMessages) {
+        if (initialQuery && !runningPlaybookId) {
           updateSystemLog('Analyzing your request...');
           
           const timeout = setTimeout(() => {
