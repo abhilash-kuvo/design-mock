@@ -46,6 +46,10 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [currentQueryContext, setCurrentQueryContext] = useState('');
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
 
+  // Save playbook state
+  const [showSavePlaybook, setShowSavePlaybook] = useState(false);
+  const [savePlaybookSuccess, setSavePlaybookSuccess] = useState(false);
+
   // File attachment state
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -141,6 +145,11 @@ const ChatPage: React.FC<ChatPageProps> = ({
             });
             updateSystemLog('Analysis complete - Scaling strategy ready for review');
             setIsProcessing(false);
+            
+            // Show save playbook option after analysis completes
+            setTimeout(() => {
+              setShowSavePlaybook(true);
+            }, 1000);
           }, 2000);
 
           return () => clearTimeout(timeout);
@@ -356,6 +365,26 @@ Just type your feedback below and I'll refine the recommendations accordingly.`,
     }, 1500);
   };
 
+  const handleSavePlaybook = () => {
+    // In a real app, this would save the current query and flow as a reusable playbook
+    console.log('Saving playbook for query:', initialQuery);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setSavePlaybookSuccess(true);
+      setShowSavePlaybook(false);
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setSavePlaybookSuccess(false);
+      }, 3000);
+    }, 1000);
+  };
+
+  const handleDismissSavePlaybook = () => {
+    setShowSavePlaybook(false);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -452,6 +481,12 @@ Would you like me to dive deeper into any of these strategies or help you implem
         setQueryFlowStep(0);
         setCurrentQueryContext('');
         setUserAnswers([]);
+        
+        // Show save playbook option after analysis completes
+        setTimeout(() => {
+          setShowSavePlaybook(true);
+        }, 1000);
+        
         updateSystemLog('Ready for your next question');
         setIsProcessing(false);
       }, 3000);
@@ -573,21 +608,79 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
               </div>
             )}
           </div>
-          <button 
-            onClick={onNavigateToConnectedAccounts}
-            className="w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-gray-200 transition-all"
-          >
-            <img
-              src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=2"
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-          </button>
+          <div className="flex items-center space-x-3">
+            {/* Save Playbook Button - Only show for regular queries (not running playbooks) */}
+            {!runningPlaybookId && showSavePlaybook && (
+              <button
+                onClick={handleSavePlaybook}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                <span>💾</span>
+                <span>Save as Playbook</span>
+              </button>
+            )}
+            
+            <button 
+              onClick={onNavigateToConnectedAccounts}
+              className="w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-gray-200 transition-all"
+            >
+              <img
+                src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=2"
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </button>
+          </div>
         </header>
 
         {/* Chat Area */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-4xl mx-auto space-y-6">
+            {/* Save Playbook Success Message */}
+            {savePlaybookSuccess && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center space-x-3 animate-in slide-in-from-top duration-300">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle size={20} className="text-green-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-green-900">Playbook Saved Successfully!</h4>
+                  <p className="text-sm text-green-700">You can now find this analysis in "My Agents" and reuse it anytime.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Save Playbook Suggestion Card */}
+            {showSavePlaybook && !runningPlaybookId && (
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-4 animate-in slide-in-from-top duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-xl">💡</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">Save as Reusable Playbook</h4>
+                      <p className="text-sm text-gray-600">Turn this analysis into a playbook you can run again with different data</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={handleDismissSavePlaybook}
+                      className="px-3 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-sm"
+                    >
+                      Dismiss
+                    </button>
+                    <button
+                      onClick={handleSavePlaybook}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    >
+                      <span>💾</span>
+                      <span>Save Playbook</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {messages.map((message, index) => {
               // Skip rendering auth messages if auth is completed
               if (message.type === 'auth' && authCompleted) {
