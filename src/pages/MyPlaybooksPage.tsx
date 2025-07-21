@@ -234,7 +234,7 @@ const MyPlaybooksPage: React.FC<MyPlaybooksPageProps> = ({
         <div className="flex-1 p-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl font-semibold text-[#333333] mb-8">
-              My Growth Agents
+              My Playbooks
             </h2>
 
             {/* Tabs with Explore Button */}

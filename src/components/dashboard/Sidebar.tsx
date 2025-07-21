@@ -56,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <Book size={20} />
-          {(forceExpanded || isOpen) && <span className="ml-2">My Agents</span>}
+          {(forceExpanded || isOpen) && <span className="ml-2">Playbooks</span>}
         </button>
 
         {/* Kuvo Agent Button */}
@@ -75,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <nav className="flex-1 px-3 py-4 overflow-y-auto">
             <div className="mb-4">
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
-                Recent Agent Runs
+                Recent Playbook Runs
               </h3>
               <div className="space-y-1">
                 {taskHistory.map((task, index) => (
