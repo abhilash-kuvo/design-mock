@@ -15,25 +15,21 @@ const AppContent: React.FC = () => {
   const [isViewingPlaybookFromLibrary, setIsViewingPlaybookFromLibrary] = React.useState(false);
   const [showCloneSuccessOnDetails, setShowCloneSuccessOnDetails] = React.useState(false);
   const [runningPlaybookId, setRunningPlaybookId] = React.useState<string>('');
-  const [isPlaybookRun, setIsPlaybookRun] = React.useState(false);
   const [previousView, setPreviousView] = React.useState<'agentRun' | 'chat' | 'myPlaybooks' | 'playbookDetails' | 'library'>('agentRun'); // Start on BuildPage
 
   const handleNewPlaybook = () => {
     setCurrentView('agentRun');
     setRunningPlaybookId('');
-    setIsPlaybookRun(false);
   };
 
   const handleMyPlaybooks = () => {
     setCurrentView('myPlaybooks');
     setRunningPlaybookId('');
-    setIsPlaybookRun(false);
   };
 
   const handleLibrary = () => {
     setCurrentView('library');
     setRunningPlaybookId('');
-    setIsPlaybookRun(false);
   };
 
   const handleNavigateToConnectedAccounts = () => {
@@ -53,7 +49,6 @@ const AppContent: React.FC = () => {
     setIsViewingPlaybookFromLibrary(false);
     setCurrentView('playbookDetails');
     setRunningPlaybookId('');
-    setIsPlaybookRun(false);
   };
 
   const handleViewPlaybookFromLibrary = (playbookId: string) => {
@@ -61,7 +56,6 @@ const AppContent: React.FC = () => {
     setIsViewingPlaybookFromLibrary(true);
     setCurrentView('playbookDetails');
     setRunningPlaybookId('');
-    setIsPlaybookRun(false);
   };
 
   const handleClonePlaybook = (playbookId: string) => {
@@ -78,13 +72,11 @@ const AppContent: React.FC = () => {
     setSelectedPlaybookId(playbookId);
     setCurrentView('playbookDetails');
     setRunningPlaybookId('');
-    setIsPlaybookRun(false);
   };
 
   const handleRunPlaybook = (playbookId: string, playbookTitle: string) => {
     // Set the running playbook ID and navigate to chat
     setRunningPlaybookId(playbookId);
-    setIsPlaybookRun(true);
     setCurrentQuery(`Running playbook: ${playbookTitle}`);
     setCurrentView('chat');
   };
@@ -103,7 +95,6 @@ const AppContent: React.FC = () => {
     setIsViewingPlaybookFromLibrary(false);
     setShowCloneSuccessOnDetails(false);
     setRunningPlaybookId('');
-    setIsPlaybookRun(false);
   };
 
   const handleBackFromChat = () => {
@@ -173,7 +164,6 @@ const AppContent: React.FC = () => {
       <ChatPage 
         initialQuery={currentQuery} 
         runningPlaybookId={runningPlaybookId}
-        isPlaybookRun={isPlaybookRun}
         onBack={handleBackFromChat}
         onNewPlaybook={handleNewPlaybook}
         onMyPlaybooks={handleMyPlaybooks}
@@ -187,7 +177,6 @@ const AppContent: React.FC = () => {
       onSubmit={(query) => {
         setCurrentQuery(query);
         setRunningPlaybookId('');
-        setIsPlaybookRun(false);
         setCurrentView('chat');
       }}
       onNewPlaybook={handleNewPlaybook}
