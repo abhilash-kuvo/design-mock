@@ -615,7 +615,7 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                 onClick={handleSavePlaybook}
                 className="flex items-center space-x-2 px-4 py-2 bg-[#FF7F50] text-white rounded-lg hover:bg-[#E67348] transition-colors text-sm font-medium"
               >
-                <span>⭐</span>
+                <span>🔖</span>
                 <span>Save as Playbook</span>
               </button>
             )}
@@ -830,7 +830,7 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-[#FFE5DC] rounded-full flex items-center justify-center">
-                      <span className="text-xl">⭐</span>
+                      <span className="text-xl">🔖</span>
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-900">Save as Reusable Playbook</h4>
@@ -848,7 +848,7 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
                       onClick={handleSavePlaybook}
                       className="flex items-center space-x-2 px-4 py-2 bg-[#FF7F50] text-white rounded-lg hover:bg-[#E67348] transition-colors text-sm font-medium"
                     >
-                      <span>⭐</span>
+                      <span>🔖</span>
                       <span>Save Playbook</span>
                     </button>
                   </div>
