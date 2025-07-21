@@ -252,7 +252,7 @@ Would you like me to dive deeper into any specific area, or shall we proceed wit
         }
       }
     }
-  }, [initialQuery, runningPlaybookId, isPlaybookRun, addMessage, setMessages]);
+  }, [initialQuery, runningPlaybookId, isPlaybookRun, addMessage, setMessages, messages]);
 
   const handleGoogleAdsAuth = () => {
     // Hide the auth panel by marking auth as completed
