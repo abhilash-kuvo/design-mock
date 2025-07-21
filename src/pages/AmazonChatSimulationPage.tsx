@@ -96,19 +96,19 @@ const AmazonChatSimulationPage: React.FC<AmazonChatSimulationPageProps> = ({
 
 To provide you with accurate scaling recommendations, I need you to upload the following 3 files from your Amazon Ads account:
 
-**Required Files:**
+Required Files:
 
-1. **Campaign_Performance_Report.csv**
-   - Download from: Amazon Ads Console → Reports → Campaign Performance
-   - Date range: Last 60 days
+1. Campaign_Performance_Report.csv
+   • Download from: Amazon Ads Console → Reports → Campaign Performance
+   • Date range: Last 60 days
 
-2. **Product_Catalog_Feed.xlsx** 
-   - Download from: Seller Central → Inventory → Manage Inventory
-   - Include: ASIN, Title, Price, Stock levels
+2. Product_Catalog_Feed.xlsx
+   • Download from: Seller Central → Inventory → Manage Inventory
+   • Include: ASIN, Title, Price, Stock levels
 
-3. **Competitor_Analysis_Data.pdf**
-   - Download from: Amazon Ads Console → Insights → Competitor Intelligence
-   - Include: Top competing ASINs and their ad spend
+3. Competitor_Analysis_Data.pdf
+   • Download from: Amazon Ads Console → Insights → Competitor Intelligence
+   • Include: Top competing ASINs and their ad spend
 
 Please upload these files using the attachment button below, and I'll analyze them to provide your personalized scaling strategy.`,
         });
