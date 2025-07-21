@@ -83,32 +83,83 @@ const ChatPage: React.FC<ChatPageProps> = ({
     if (initialQuery) {
       // If running a playbook, show authentication flow first
       if (runningPlaybookId) {
-        const playbookTitle = getPlaybookTitle(runningPlaybookId);
-        
-        // Clear existing messages and add the playbook start message
-        setMessages([]);
-        addMessage({
-          type: 'assistant',
-          content: `Starting playbook execution: ${playbookTitle}`,
-        });
-
-        updateSystemLog('Preparing playbook execution...');
-
-        const timeouts: NodeJS.Timeout[] = [];
-
-        timeouts.push(setTimeout(() => {
+        if (runningPlaybookId === '1') {
+          // Google Ads playbook - show authentication flow
+          const playbookTitle = getPlaybookTitle(runningPlaybookId);
+          
+          // Clear existing messages and add the playbook start message
+          setMessages([]);
           addMessage({
-            type: 'auth',
-            content: 'This playbook requires access to your Google Ads account to analyze campaign data and implement recommendations.',
-            showAuthButtons: true,
+            type: 'assistant',
+            content: `Starting playbook execution: ${playbookTitle}`,
           });
-          updateSystemLog('Authentication required');
-          setIsProcessing(false);
-        }, 1500));
 
-        return () => {
-          timeouts.forEach(timeout => clearTimeout(timeout));
-        };
+          updateSystemLog('Preparing playbook execution...');
+
+          const timeouts: NodeJS.Timeout[] = [];
+
+          timeouts.push(setTimeout(() => {
+            addMessage({
+              type: 'auth',
+              content: 'This playbook requires access to your Google Ads account to analyze campaign data and implement recommendations.',
+              showAuthButtons: true,
+            });
+            updateSystemLog('Authentication required');
+            setIsProcessing(false);
+          }, 1500));
+
+          return () => {
+            timeouts.forEach(timeout => clearTimeout(timeout));
+          };
+        } else if (runningPlaybookId === '2') {
+          // Amazon Ads playbook - direct analysis
+          const playbookTitle = getPlaybookTitle(runningPlaybookId);
+          
+          setMessages([]);
+          addMessage({
+            type: 'assistant',
+            content: `Starting playbook execution: ${playbookTitle}`,
+          });
+
+          updateSystemLog('Analyzing your request...');
+          
+          const timeout = setTimeout(() => {
+            addMessage({
+              type: 'assistant',
+              content: `✅ Analysis Complete! I've successfully analyzed your Amazon Ads account and identified key scaling opportunities.\n\nBased on your campaigns, I've prepared a comprehensive scaling strategy that includes:\n\n• Campaign structure optimization recommendations\n• High-potential keyword expansion opportunities  \n• Budget reallocation strategies for maximum ROI\n• Performance-based bidding adjustments\n• Inventory velocity optimization tactics\n\nYour personalized Amazon ads scaling plan is ready! This strategy is designed to help you increase sales volume while maintaining or improving your current ACoS.\n\nWould you like me to dive deeper into any specific area, or shall we proceed with implementing these recommendations?`,
+              downloadFiles: [
+                {
+                  id: 'scaling-strategy-1',
+                  name: 'Amazon Ads Scaling Strategy Report.pdf',
+                  description: 'Comprehensive scaling strategy with actionable recommendations',
+                  type: 'pdf'
+                },
+                {
+                  id: 'keyword-opportunities-1',
+                  name: 'High-Potential Keywords Analysis.xlsx',
+                  description: 'Keyword expansion opportunities with search volume data',
+                  type: 'xlsx'
+                },
+                {
+                  id: 'budget-optimization-1',
+                  name: 'Budget Reallocation Plan.csv',
+                  description: 'Campaign-level budget optimization recommendations',
+                  type: 'csv'
+                }
+              ]
+            });
+            updateSystemLog('Analysis complete - Scaling strategy ready for review');
+            setIsProcessing(false);
+            
+            // Show save playbook option after analysis completes
+            setTimeout(() => {
+              setShowSavePlaybook(true);
+              setShowSavePlaybookCard(true);
+            }, 1000);
+          }, 2000);
+
+          return () => clearTimeout(timeout);
+        }
       } else {
         // For all regular queries, trigger Amazon Ads scaling Q&A flow
         const hasAssistantMessages = messages.some(msg => msg.type === 'assistant');
