@@ -6,14 +6,7 @@ import Sidebar from '../components/dashboard/Sidebar';
 import AgentSelector from '../components/dashboard/AgentSelector';
 import FileChip from '../components/ui/FileChip';
 import CsvDataTable from '../components/ui/CsvDataTable';
-import BottomDrawerLogs from '../components/BottomDrawerLogs';
 import { useChat, AttachedFile, ChatMessage } from '../contexts/ChatContext';
-
-interface SystemLogEntry {
-  id: string;
-  message: string;
-  timestamp: Date;
-}
 
 interface AmazonChatSimulationPageProps {
   initialQuery: string;
@@ -37,8 +30,6 @@ const AmazonChatSimulationPage: React.FC<AmazonChatSimulationPageProps> = ({
   const [systemLog, setSystemLog] = useState('Analyzing your request...');
   const [isProcessing, setIsProcessing] = useState(true);
   const [authCompleted, setAuthCompleted] = useState(false);
-  const [systemLogHistory, setSystemLogHistory] = useState<SystemLogEntry[]>([]);
-  const [showLogDrawer, setShowLogDrawer] = useState(false);
   const { messages, setMessages, addMessage, addUserMessage } = useChat();
   
   // Q&A Flow State
@@ -58,12 +49,6 @@ const AmazonChatSimulationPage: React.FC<AmazonChatSimulationPageProps> = ({
   // Helper function to update system log and add to history
   const updateSystemLog = (message: string) => {
     setSystemLog(message);
-    const logEntry: SystemLogEntry = {
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      message,
-      timestamp: new Date(),
-    };
-    setSystemLogHistory(prev => [logEntry, ...prev]);
   };
 
   // Mock playbook data for display
@@ -290,17 +275,6 @@ Campaign D,$800,$1200,$2400,Low`;
             )}
           </div>
           <div className="flex items-center space-x-3">
-            {/* Save Playbook Button - Only show for regular queries (not running playbooks) */}
-            {!runningPlaybookId && showSavePlaybook && (
-              <button
-                onClick={handleSavePlaybook}
-                className="flex items-center space-x-2 px-4 py-2 bg-[#FF7F50] text-white rounded-lg hover:bg-[#E67348] transition-colors text-sm font-medium"
-              >
-                <span>🔖</span>
-                <span>Save as Playbook</span>
-              </button>
-            )}
-            
             <button 
               onClick={onNavigateToConnectedAccounts}
               className="w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-gray-200 transition-all"
@@ -464,17 +438,20 @@ Campaign D,$800,$1200,$2400,Low`;
               ) : (
                 <div className="w-2 h-2 rounded-full bg-[#22C55E]" />
               )}
-              <div className="flex items-center justify-between w-full">
-                <span className="text-sm text-[#FF7F50] font-medium">
-                  {systemLog}
-                </span>
+              <span className="text-sm text-[#FF7F50] font-medium">
+                {systemLog}
+              </span>
+              
+              {/* Save Playbook Button - Only show for regular queries (not running playbooks) */}
+              {!runningPlaybookId && showSavePlaybook && (
                 <button
-                  onClick={() => setShowLogDrawer(true)}
-                  className="text-xs text-gray-500 hover:text-[#FF7F50] transition-colors underline"
+                  onClick={handleSavePlaybook}
+                  className="flex items-center space-x-2 px-3 py-1.5 bg-[#FF7F50] text-white rounded-lg hover:bg-[#E67348] transition-colors text-xs font-medium ml-auto"
                 >
-                  View Logs
+                  <span>🔖</span>
+                  <span>Save as Playbook</span>
                 </button>
-              </div>
+              )}
             </div>
 
             <div className="relative bg-white rounded-b-2xl shadow-sm">
@@ -537,13 +514,6 @@ Campaign D,$800,$1200,$2400,Low`;
           </div>
         </div>
       </div>
-
-      {/* Bottom Drawer Logs */}
-      <BottomDrawerLogs
-        logHistory={systemLogHistory}
-        isOpen={showLogDrawer}
-        onClose={() => setShowLogDrawer(false)}
-      />
     </div>
   );
 };
