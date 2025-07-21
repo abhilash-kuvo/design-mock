@@ -97,8 +97,7 @@ const AmazonChatSimulationPage: React.FC<AmazonChatSimulationPageProps> = ({
 
         updateSystemLog('Connecting to Amazon Advertising API...');
 
-        // Simple file upload request
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
           addMessage({
             type: 'assistant',
             content: `To provide you with accurate scaling recommendations, I need you to upload the following 3 files from your Amazon Ads account:
@@ -122,6 +121,10 @@ Please upload these files using the attachment button below, and I'll analyze th
           updateSystemLog('Waiting for file uploads...');
           setIsProcessing(false);
         }, 2000);
+
+        return () => {
+          clearTimeout(timeout);
+        };
       }
     }
   }, [initialQuery, runningPlaybookId, addMessage, setMessages]);
