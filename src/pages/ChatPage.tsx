@@ -18,6 +18,7 @@ interface SystemLogEntry {
 interface ChatPageProps {
   initialQuery: string;
   runningPlaybookId?: string;
+  isPlaybookRun?: boolean;
   onBack: () => void;
   onNewPlaybook: () => void;
   onMyPlaybooks: () => void;
@@ -27,6 +28,7 @@ interface ChatPageProps {
 const ChatPage: React.FC<ChatPageProps> = ({ 
   initialQuery, 
   runningPlaybookId,
+  isPlaybookRun = false,
   onBack, 
   onNewPlaybook, 
   onMyPlaybooks,
@@ -81,13 +83,13 @@ const ChatPage: React.FC<ChatPageProps> = ({
 
   useEffect(() => {
     if (initialQuery) {
-      // If running a playbook, show authentication flow first
+      // Clear messages for any new session
+      setMessages([]);
+      
+      // If running a playbook from My Playbooks page
       if (runningPlaybookId) {
-        // Clear existing messages first for playbook runs
-        setMessages([]);
-        
         if (runningPlaybookId === '1') {
-          // Google Ads Simulation
+          // Google Ads Simulation - Same for both sources
           const playbookTitle = getPlaybookTitle(runningPlaybookId);
           
           addMessage({
@@ -112,7 +114,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
           return () => {
             timeouts.forEach(timeout => clearTimeout(timeout));
           };
-        } else if (runningPlaybookId === '2') {
+        } else if (runningPlaybookId === '2' && !isPlaybookRun) {
           // Amazon Ads Simulation
           const playbookTitle = getPlaybookTitle(runningPlaybookId);
           
@@ -172,6 +174,25 @@ Would you like me to dive deeper into any specific area, or shall we proceed wit
           }, 2000);
 
           return () => clearTimeout(timeout);
+        } else if (runningPlaybookId === '2' && isPlaybookRun) {
+          // Amazon Ads from My Playbooks - Ask for files
+          const playbookTitle = getPlaybookTitle(runningPlaybookId);
+          
+          addMessage({
+            type: 'assistant',
+            content: `Starting playbook execution: ${playbookTitle}`,
+          });
+
+          updateSystemLog('Preparing playbook execution...');
+
+          setTimeout(() => {
+            addMessage({
+              type: 'assistant',
+              content: `This playbook requires 3 input files to proceed:\n\n• Campaign Performance Data.csv\n• Product Catalog.xlsx\n• Competitor Analysis.pdf\n\nPlease attach them using the paperclip icon below and I'll analyze your data.`,
+            });
+            updateSystemLog('Waiting for required input files...');
+            setIsProcessing(false);
+          }, 1500);
         }
       } else {
         // For regular queries (not running playbooks), show the analysis flow
@@ -231,7 +252,7 @@ Would you like me to dive deeper into any specific area, or shall we proceed wit
         }
       }
     }
-  }, [initialQuery, runningPlaybookId, addMessage, setMessages]);
+  }, [initialQuery, runningPlaybookId, isPlaybookRun, addMessage, setMessages]);
 
   const handleGoogleAdsAuth = () => {
     // Hide the auth panel by marking auth as completed
