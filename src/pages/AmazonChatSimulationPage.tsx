@@ -120,6 +120,7 @@ Please upload these files using the attachment button below, and I'll analyze th
           });
           updateSystemLog('Waiting for file uploads...');
           setIsProcessing(false);
+          setIsProcessing(false);
         }, 2000);
 
         return () => {
