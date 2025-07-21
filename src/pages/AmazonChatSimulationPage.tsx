@@ -86,21 +86,15 @@ const AmazonChatSimulationPage: React.FC<AmazonChatSimulationPageProps> = ({
         setMessages([]);
       }
 
-      // NEW AMAZON ADS SIMULATION - Completely different behavior
+      // SIMPLE AMAZON ADS SIMULATION - Just ask for files immediately
       if (runningPlaybookId === '2') {
         const playbookTitle = getPlaybookTitle(runningPlaybookId);
         
         addMessage({
           type: 'assistant',
-          content: `🚀 Starting Advanced Amazon Ads Analysis: ${playbookTitle}`,
-        });
+          content: `🚀 Starting ${playbookTitle}
 
-        updateSystemLog('Connecting to Amazon Advertising API...');
-
-        const timeout = setTimeout(() => {
-          addMessage({
-            type: 'assistant',
-            content: `To provide you with accurate scaling recommendations, I need you to upload the following 3 files from your Amazon Ads account:
+To provide you with accurate scaling recommendations, I need you to upload the following 3 files from your Amazon Ads account:
 
 **Required Files:**
 
@@ -117,15 +111,10 @@ const AmazonChatSimulationPage: React.FC<AmazonChatSimulationPageProps> = ({
    - Include: Top competing ASINs and their ad spend
 
 Please upload these files using the attachment button below, and I'll analyze them to provide your personalized scaling strategy.`,
-          });
-          updateSystemLog('Waiting for file uploads...');
-          setIsProcessing(false);
-          setIsProcessing(false);
-        }, 2000);
+        });
 
-        return () => {
-          clearTimeout(timeout);
-        };
+        updateSystemLog('Waiting for file uploads...');
+        setIsProcessing(false);
       }
     }
   }, [initialQuery, runningPlaybookId, addMessage, setMessages]);
