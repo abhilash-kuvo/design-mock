@@ -84,7 +84,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
       // If running a playbook, show authentication flow first
       if (runningPlaybookId) {
         if (runningPlaybookId === '1') {
-          // Google Ads playbook - show authentication flow
+          // Google Ads Simulation
           const playbookTitle = getPlaybookTitle(runningPlaybookId);
           
           // Clear existing messages and add the playbook start message
@@ -112,21 +112,35 @@ const ChatPage: React.FC<ChatPageProps> = ({
             timeouts.forEach(timeout => clearTimeout(timeout));
           };
         } else if (runningPlaybookId === '2') {
-          // Amazon Ads playbook - direct analysis
+          // Amazon Ads Simulation
           const playbookTitle = getPlaybookTitle(runningPlaybookId);
           
+          // Clear existing messages and add the playbook start message
           setMessages([]);
           addMessage({
             type: 'assistant',
             content: `Starting playbook execution: ${playbookTitle}`,
           });
 
-          updateSystemLog('Analyzing your request...');
-          
+          updateSystemLog('Analyzing your Amazon Ads account...');
+          setIsProcessing(true);
+
           const timeout = setTimeout(() => {
             addMessage({
               type: 'assistant',
-              content: `✅ Analysis Complete! I've successfully analyzed your Amazon Ads account and identified key scaling opportunities.\n\nBased on your campaigns, I've prepared a comprehensive scaling strategy that includes:\n\n• Campaign structure optimization recommendations\n• High-potential keyword expansion opportunities  \n• Budget reallocation strategies for maximum ROI\n• Performance-based bidding adjustments\n• Inventory velocity optimization tactics\n\nYour personalized Amazon ads scaling plan is ready! This strategy is designed to help you increase sales volume while maintaining or improving your current ACoS.\n\nWould you like me to dive deeper into any specific area, or shall we proceed with implementing these recommendations?`,
+              content: `✅ Analysis Complete! I've successfully analyzed your Amazon Ads account and identified key scaling opportunities.
+
+Based on your campaigns, I've prepared a comprehensive scaling strategy that includes:
+
+• Campaign structure optimization recommendations
+• High-potential keyword expansion opportunities  
+• Budget reallocation strategies for maximum ROI
+• Performance-based bidding adjustments
+• Inventory velocity optimization tactics
+
+Your personalized Amazon ads scaling plan is ready! This strategy is designed to help you increase sales volume while maintaining or improving your current ACoS.
+
+Would you like me to dive deeper into any specific area, or shall we proceed with implementing these recommendations?`,
               downloadFiles: [
                 {
                   id: 'scaling-strategy-1',
@@ -161,41 +175,50 @@ const ChatPage: React.FC<ChatPageProps> = ({
           return () => clearTimeout(timeout);
         }
       } else {
-        // For all regular queries, trigger Amazon Ads scaling Q&A flow
+        // For regular queries (not running playbooks), show the analysis flow
         const hasAssistantMessages = messages.some(msg => msg.type === 'assistant');
         
         if (!hasAssistantMessages) {
-          // All queries trigger Amazon Ads scaling Q&A flow
-          setCurrentQueryContext(initialQuery);
-          setQueryFlowStep(1);
           updateSystemLog('Analyzing your request...');
           
           const timeout = setTimeout(() => {
             addMessage({
               type: 'assistant',
-              content: `✅ Analysis Complete! I've successfully analyzed your request and identified key scaling opportunities for your Amazon ads.\n\nBased on your query "${currentQueryContext}", I've prepared a comprehensive scaling strategy that includes:\n\n• Campaign structure optimization recommendations\n• High-potential keyword expansion opportunities  \n• Budget reallocation strategies for maximum ROI\n• Performance-based bidding adjustments\n• Inventory velocity optimization tactics\n\nYour personalized Amazon ads scaling plan is ready! This strategy is designed to help you increase sales volume while maintaining or improving your current ACoS.\n\nWould you like me to dive deeper into any specific area, or shall we proceed with implementing these recommendations?`,
+              content: `✅ Analysis Complete! I've successfully analyzed your request and identified key opportunities.
+
+Based on your query "${initialQuery}", I've prepared a comprehensive strategy that includes:
+
+• Campaign structure optimization recommendations
+• High-potential keyword expansion opportunities  
+• Budget reallocation strategies for maximum ROI
+• Performance-based bidding adjustments
+• Optimization tactics for better performance
+
+Your personalized advertising plan is ready! This strategy is designed to help you improve performance while maintaining efficiency.
+
+Would you like me to dive deeper into any specific area, or shall we proceed with implementing these recommendations?`,
               downloadFiles: [
                 {
-                  id: 'scaling-strategy-1',
-                  name: 'Amazon Ads Scaling Strategy Report.pdf',
-                  description: 'Comprehensive scaling strategy with actionable recommendations',
+                  id: 'strategy-report-1',
+                  name: 'Advertising Strategy Report.pdf',
+                  description: 'Comprehensive strategy with actionable recommendations',
                   type: 'pdf'
                 },
                 {
-                  id: 'keyword-opportunities-1',
+                  id: 'keyword-analysis-1',
                   name: 'High-Potential Keywords Analysis.xlsx',
                   description: 'Keyword expansion opportunities with search volume data',
                   type: 'xlsx'
                 },
                 {
-                  id: 'budget-optimization-1',
+                  id: 'budget-plan-1',
                   name: 'Budget Reallocation Plan.csv',
                   description: 'Campaign-level budget optimization recommendations',
                   type: 'csv'
                 }
               ]
             });
-            updateSystemLog('Analysis complete - Scaling strategy ready for review');
+            updateSystemLog('Analysis complete - Strategy ready for review');
             setIsProcessing(false);
             
             // Show save playbook option after analysis completes
