@@ -636,51 +636,6 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
         {/* Chat Area */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-4xl mx-auto space-y-6">
-            {/* Save Playbook Success Message */}
-            {savePlaybookSuccess && (
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center space-x-3 animate-in slide-in-from-top duration-300">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle size={20} className="text-green-600" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-green-900">Playbook Saved Successfully!</h4>
-                  <p className="text-sm text-green-700">You can now find this analysis in "My Agents" and reuse it anytime.</p>
-                </div>
-              </div>
-            )}
-
-            {/* Save Playbook Suggestion Card */}
-            {showSavePlaybook && !runningPlaybookId && (
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-4 animate-in slide-in-from-top duration-300">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-xl">💡</span>
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Save as Reusable Playbook</h4>
-                      <p className="text-sm text-gray-600">Turn this analysis into a playbook you can run again with different data</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={handleDismissSavePlaybook}
-                      className="px-3 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-sm"
-                    >
-                      Dismiss
-                    </button>
-                    <button
-                      onClick={handleSavePlaybook}
-                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                    >
-                      <span>💾</span>
-                      <span>Save Playbook</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {messages.map((message, index) => {
               // Skip rendering auth messages if auth is completed
               if (message.type === 'auth' && authCompleted) {
@@ -856,6 +811,51 @@ vs,Phrase,290,8,$75.00,1,Monitor - evaluate based on strategy`;
         {/* System Status & Input Area */}
         <div className="px-6 pb-6">
           <div className="max-w-4xl mx-auto">
+            {/* Save Playbook Success Message */}
+            {savePlaybookSuccess && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center space-x-3 animate-in slide-in-from-bottom duration-300 mb-4">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle size={20} className="text-green-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-green-900">Playbook Saved Successfully!</h4>
+                  <p className="text-sm text-green-700">You can now find this analysis in "My Agents" and reuse it anytime.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Save Playbook Suggestion Card */}
+            {showSavePlaybook && !runningPlaybookId && (
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-4 animate-in slide-in-from-bottom duration-300 mb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-xl">💡</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">Save as Reusable Playbook</h4>
+                      <p className="text-sm text-gray-600">Turn this analysis into a playbook you can run again with different data</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={handleDismissSavePlaybook}
+                      className="px-3 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-sm"
+                    >
+                      Dismiss
+                    </button>
+                    <button
+                      onClick={handleSavePlaybook}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    >
+                      <span>💾</span>
+                      <span>Save Playbook</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="bg-[#FFF5F2] rounded-t-lg p-3 flex items-center gap-3">
               {isProcessing ? (
                 <Loader2 size={16} className="text-[#FF7F50] animate-spin" />
