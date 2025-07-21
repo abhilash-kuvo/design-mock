@@ -390,6 +390,118 @@ Just type your feedback below and I'll refine the recommendations accordingly.`,
       setShowSavePlaybook(false);
       
       // Hide success message after 3 seconds
+        // Check if this is an Amazon-related query from Kuvo Agent page
+        if (initialQuery.toLowerCase().includes('amazon') && initialQuery.toLowerCase().includes('scaling')) {
+          updateSystemLog('Connecting to Amazon Advertising API...');
+          
+          const timeouts: NodeJS.Timeout[] = [];
+
+          // Step 1: API Connection
+          timeouts.push(setTimeout(() => {
+            addMessage({
+              type: 'assistant',
+              content: 'Step 1: Establishing secure connection to Amazon Advertising API',
+              isCollapsible: true,
+              details: [
+                'Authenticating with Amazon Seller Central',
+                'Retrieving campaign data from the last 90 days',
+                'Accessing product catalog and inventory levels',
+                'Collecting competitor intelligence data'
+              ]
+            });
+            updateSystemLog('Analyzing campaign performance data...');
+          }, 1500));
+
+          // Step 2: Data Analysis
+          timeouts.push(setTimeout(() => {
+            addMessage({
+              type: 'assistant',
+              content: 'Step 2: Advanced performance analysis in progress',
+              isCollapsible: true,
+              details: [
+                'Processing 15,000+ search terms across 8 campaigns',
+                'Analyzing ACoS trends and seasonal patterns',
+                'Identifying top-performing ASINs and keywords',
+                'Calculating inventory velocity and profit margins'
+              ]
+            });
+            updateSystemLog('Generating scaling recommendations...');
+          }, 3000));
+
+          // Step 3: AI-Powered Insights
+          timeouts.push(setTimeout(() => {
+            addMessage({
+              type: 'assistant',
+              content: 'Step 3: AI-powered scaling opportunity detection',
+              isCollapsible: true,
+              details: [
+                'Machine learning analysis of 50+ performance metrics',
+                'Competitor gap analysis and market opportunity sizing',
+                'Predictive modeling for budget scaling scenarios',
+                'Risk assessment for aggressive scaling strategies'
+              ]
+            });
+            updateSystemLog('Finalizing recommendations and reports...');
+          }, 4500));
+
+          // Step 4: Results
+          timeouts.push(setTimeout(() => {
+            addMessage({
+              type: 'assistant',
+              content: `🎯 **Amazon Ads Scaling Analysis Complete!**
+
+I've identified **12 high-impact scaling opportunities** that could increase your sales by 40-60% while maintaining your target ACoS.
+
+**Key Findings:**
+• **$45,000** monthly revenue opportunity identified
+• **3 underperforming campaigns** ready for optimization  
+• **127 high-potential keywords** for expansion
+• **5 competitor gaps** you can exploit immediately
+
+**Priority Recommendations:**
+1. **Campaign Budget Reallocation** - Shift $8,000/month to top performers
+2. **Keyword Expansion** - Add 127 validated high-converting terms
+3. **Bid Strategy Optimization** - Implement dynamic bidding on 15 ASINs
+4. **New Campaign Launch** - Target 3 untapped product categories
+
+Your detailed scaling strategy is ready for download!`,
+              downloadFiles: [
+                {
+                  id: 'amazon-strategy-1',
+                  name: 'Amazon Scaling Strategy Report.pdf',
+                  description: 'Comprehensive scaling recommendations with implementation timeline',
+                  type: 'pdf'
+                },
+                {
+                  id: 'keyword-opportunities-1',
+                  name: 'High-Opportunity Keywords.xlsx',
+                  description: '127 validated keywords with search volume and competition data',
+                  type: 'xlsx'
+                },
+                {
+                  id: 'budget-reallocation-1',
+                  name: 'Budget Optimization Plan.csv',
+                  description: 'Campaign-level budget reallocation recommendations',
+                  type: 'csv'
+                }
+              ]
+            });
+            updateSystemLog('Analysis complete - Strategy ready for implementation');
+            setIsProcessing(false);
+            
+            // Show save playbook option after analysis completes
+            setTimeout(() => {
+              setShowSavePlaybook(true);
+              setShowSavePlaybookCard(true);
+            }, 1000);
+          }, 6000));
+
+          return () => {
+            timeouts.forEach(timeout => clearTimeout(timeout));
+          };
+        }
+        
+        // Default generic analysis for other queries
       setTimeout(() => {
         setSavePlaybookSuccess(false);
       }, 3000);
